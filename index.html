@@ -31,6 +31,13 @@
     --text:       #e2e8f0;
     --text-muted: #6a849a;
     --text-dim:   #2a3a4a;
+    --gold:       #ffd700;
+    --gold-dim:   #b89a0a;
+    --gold-glow:  rgba(255,215,0,0.20);
+    --gold-bg:    rgba(255,215,0,0.06);
+    --silver:     #a8c4d8;
+    --silver-dim: #5a8090;
+    --silver-bg:  rgba(168,196,216,0.06);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -247,6 +254,55 @@
   .verdict-text.good    { color:var(--green);      background:var(--green-bg); border:2px solid var(--green-dim); }
   .verdict-text.bad     { color:var(--red-bright);  background:var(--red-bg);   border:2px solid var(--red-dim); }
   .verdict-text.neutral { color:var(--text-muted);  background:var(--grey-bg);  border:2px solid var(--grey); }
+  .verdict-text.star    {
+    color:var(--gold); background:var(--gold-bg); border:2px solid var(--gold-dim);
+    box-shadow:0 0 18px var(--gold-glow);
+    animation:starPulse 2s ease-in-out infinite;
+  }
+  .verdict-text.weight-star {
+    color:var(--silver); background:var(--silver-bg); border:2px solid var(--silver-dim);
+  }
+  @keyframes starPulse {
+    0%,100% { box-shadow:0 0 12px var(--gold-glow); }
+    50%      { box-shadow:0 0 28px var(--gold-glow), 0 0 8px rgba(255,215,0,0.3); }
+  }
+
+  /* ── PRIORITY / SPIKE STAT ROWS ── */
+  .stat-row.spike-primary {
+    border-color: var(--gold-dim) !important;
+    background: var(--gold-bg) !important;
+    box-shadow: 0 0 14px var(--gold-glow), inset 0 0 0 1px rgba(255,215,0,0.08);
+  }
+  .stat-row.spike-primary .stat-bar-fill {
+    background: linear-gradient(90deg, #b89a0a, var(--gold)) !important;
+  }
+  .stat-row.spike-primary .variance-badge { color:var(--gold) !important; }
+  .stat-row.spike-secondary {
+    border-color: var(--silver-dim) !important;
+    background: var(--silver-bg) !important;
+  }
+  .stat-row.spike-secondary .stat-bar-fill {
+    background: linear-gradient(90deg, var(--silver-dim), var(--silver)) !important;
+  }
+  .stat-row.spike-secondary .variance-badge { color:var(--silver) !important; }
+
+  .priority-badge {
+    font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1px;
+    padding:2px 6px; border-radius:8px; text-transform:uppercase;
+    font-weight:700; margin-left:4px; flex-shrink:0;
+  }
+  .priority-badge.p1 { color:var(--gold);   background:var(--gold-bg);   border:1px solid var(--gold-dim); }
+  .priority-badge.p2 { color:var(--silver); background:var(--silver-bg); border:1px solid var(--silver-dim); }
+
+  .spike-marker {
+    position:absolute; top:-6px; bottom:-6px; width:3px;
+    background:var(--gold); border-radius:2px; opacity:0;
+    transition:left .3s, opacity .3s;
+    box-shadow:0 0 8px var(--gold-glow);
+    pointer-events:none;
+  }
+  .stat-row.spike-primary .spike-marker,
+  .stat-row.spike-secondary .spike-marker { opacity:0.85; }
 
   /* ── CLEAR BTN ── */
   .btn-clear {
@@ -534,13 +590,6 @@
             </span>
           </div>
         </div>
-        <div class="toggle-row">
-          <span class="tip">
-            <input type="checkbox" id="useOffset" class="toggle">
-            <span class="tip-box">Toggle calculation method. Use Level÷6 by default. Switch to (Level−1)÷6 if your server counts level 1 as a base level with no assigned stat points.</span>
-          </span>
-          <label class="toggle-label" for="useOffset">Use (Level − 1) ÷ 6</label>
-        </div>
       </div>
 
       <div class="avg-display">
@@ -550,7 +599,7 @@
             <div class="avg-value-label">Calculated Baseline</div>
             <div class="avg-value-num" id="avgDisplay">25.0</div>
           </div>
-          <span class="tip-box">The ideal average if all stat points were perfectly distributed. Changes automatically based on whether you're using 6-stat or 5-stat mode.</span>
+          <span class="tip-box">The average points per stat if the level were split perfectly. Rounded down. Use this as your benchmark — priority stats (Health, Stamina, Damage) should ideally beat this number.</span>
         </span>
       </div>
     </div>
@@ -563,7 +612,7 @@
           <button class="mode-btn active" id="btn6stat" onclick="setStatMode(6)">6 Stats</button>
           <button class="mode-btn"        id="btn5stat" onclick="setStatMode(5)">5 Stats (No Oxygen)</button>
         </div>
-        <span class="tip-box">Some dinos don't have an Oxygen stat (e.g. Rex, Giga, Therizino, Wyvern). Switch to 5-stat mode to exclude Oxygen from the calculation — the average will be based on 5 stats instead of 6, giving you a more accurate baseline.</span>
+        <span class="tip-box">Most land and air dinos have 6 stats including Oxygen (e.g. Rex, Giga, Wyvern, Raptor). Fully aquatic dinos have no Oxygen stat and only 5 stats (e.g. Sarco, Deinosuchus, Megalodon, Plesiosaur). The baseline average adjusts automatically.</span>
       </span>
       <span class="mode-badge six" id="modeBadge">÷ 6 stats</span>
     </div>
@@ -573,10 +622,11 @@
   <div class="panel blue-panel">
     <div class="panel-title"><span class="icon">🦕</span> Stat Comparator</div>
     <div class="legend">
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Above Avg</div><span class="tip-box bl">More points than the baseline — desirable for breeding selection!</span></span>
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--grey)"></div> At Average</div><span class="tip-box">Exactly average — neutral stat allocation.</span></span>
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--red-bright)"></div> Below Avg</div><span class="tip-box">Below average — points were wasted here instead of useful stats.</span></span>
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--red-bright);border-radius:2px;"></div> Avg Marker</div><span class="tip-box">The red line on each bar shows exactly where the average baseline falls.</span></span>
+      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> ⭐ Star Stat</div><span class="tip-box bl">A huge spike in a priority stat (Health, Stamina or Damage) — this dino is worth keeping regardless of overall spread.</span></span>
+      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--silver)"></div> Weight Spike</div><span class="tip-box bl">Major Weight spike — valuable for flyers and hauling dinos even if other stats are poor.</span></span>
+      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Above Avg</div><span class="tip-box bl">More points than the baseline — desirable for breeding.</span></span>
+      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--grey)"></div> At Average</div><span class="tip-box">Exactly average — neutral allocation.</span></span>
+      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--red-bright)"></div> Below Avg</div><span class="tip-box">Points wasted here instead of useful stats.</span></span>
     </div>
     <div class="grid-header">
       <span>Stat</span>
@@ -611,7 +661,7 @@
     <div class="verdict">
       <span class="tip">
         <span class="verdict-text neutral" id="verdictText">Awaiting Data</span>
-        <span class="tip-box">Overall breeding verdict. ✓ Strong Breed = keep &amp; breed on. ~ Marginal = situational. ✕ Cull = not worth breeding.</span>
+        <span class="tip-box">⭐ Star Dino = massive spike in Health, Stamina or Damage — breed it regardless of overall spread. ⭐ Weight Star = huge Weight spike, valuable for flyers. ✓ Strong Breed = good overall spread. ~ Marginal = situational. ✕ Cull = nothing worth keeping.</span>
       </span>
     </div>
   </div>
@@ -630,13 +680,21 @@
 
 <script>
 const STATS = [
-  { key:'health',  name:'Health',  icon:'♥', tip:'Total hit points. Critical for tanks and general tames. Aim for above-average here.' },
-  { key:'stamina', name:'Stamina', icon:'⚡', tip:'Energy pool for sprinting and attacking. Low stamina = dino stops mid-fight.' },
-  { key:'oxygen',  name:'Oxygen',  icon:'◎', tip:'Underwater breath capacity. Usually a dump stat for land dinos — low is fine for most.' },
-  { key:'food',    name:'Food',    icon:'⬟', tip:'Rate of hunger. Higher food = less frequent feeding. Usually not a breeding priority.' },
-  { key:'weight',  name:'Weight',  icon:'⊞', tip:'Carry capacity. Essential for hauling dinos like Argent, Anky, Castoroides.' },
-  { key:'damage',  name:'Damage',  icon:'⚔', tip:'Melee damage multiplier. Critical for combat dinos — more points = more pain dealt.' },
+  { key:'health',  name:'Health',  icon:'♥', priority:1,
+    tip:'Total hit points. PRIORITY STAT — a big spike here is worth breeding on even if everything else is poor.' },
+  { key:'stamina', name:'Stamina', icon:'⚡', priority:1,
+    tip:'Energy for sprinting and attacking. PRIORITY STAT — high stamina is critical for combat and travel dinos.' },
+  { key:'oxygen',  name:'Oxygen',  icon:'◎', priority:0,
+    tip:'Underwater breath capacity. Dump stat for most dinos — a spike here is not useful for breeding.' },
+  { key:'food',    name:'Food',    icon:'⬟', priority:0,
+    tip:'Hunger rate. Not a breeding priority — a spike here is wasted RNG.' },
+  { key:'weight',  name:'Weight',  icon:'⊞', priority:2,
+    tip:'Carry capacity. SECONDARY PRIORITY — especially important for flyers (Argent, Wyvern) and hauling dinos. A big spike here is worth noting.' },
+  { key:'damage',  name:'Damage',  icon:'⚔', priority:1,
+    tip:'Melee damage multiplier. PRIORITY STAT — a spike here is extremely valuable for combat lines. Always breed on this.' },
 ];
+
+// priority: 1 = top tier (Health/Stamina/Damage), 2 = secondary (Weight), 0 = dump stat
 
 let currentAvg = 25.0, maxStatSeen = 1, statMode = 6;
 
@@ -644,33 +702,25 @@ function getStatCount() { return statMode; }
 
 function getAvg() {
   const level = parseInt(document.getElementById('dinoLevel').value) || 150;
-  const off = document.getElementById('useOffset').checked;
-  return (off ? (level - 1) : level) / getStatCount();
+  return Math.floor(level / getStatCount());
+}
+
+// Spike threshold: at least 30% above average, minimum 6 points
+function spikeThreshold() {
+  return Math.max(6, Math.floor(currentAvg * 0.3));
 }
 
 function setStatMode(n) {
   statMode = n;
-  // Update pill buttons
   document.getElementById('btn6stat').className = 'mode-btn' + (n===6 ? ' active' : '');
   document.getElementById('btn5stat').className = 'mode-btn' + (n===5 ? ' active blue-mode' : '');
-  // Update badge
   const badge = document.getElementById('modeBadge');
-  if (n === 5) {
-    badge.textContent = '÷ 5 stats';
-    badge.className = 'mode-badge five';
-  } else {
-    badge.textContent = '÷ 6 stats';
-    badge.className = 'mode-badge six';
-  }
-  // Toggle oxygen row
-  const oxyRow = document.getElementById('row-oxygen');
+  if (n === 5) { badge.textContent = '÷ 5 stats'; badge.className = 'mode-badge five'; }
+  else         { badge.textContent = '÷ 6 stats'; badge.className = 'mode-badge six'; }
+  const oxyRow   = document.getElementById('row-oxygen');
   const oxyInput = document.getElementById('input-oxygen');
-  if (n === 5) {
-    oxyRow.classList.add('disabled');
-    oxyInput.value = '';
-  } else {
-    oxyRow.classList.remove('disabled');
-  }
+  if (n === 5) { oxyRow.classList.add('disabled'); oxyInput.value = ''; }
+  else         { oxyRow.classList.remove('disabled'); }
   updateAvg();
 }
 
@@ -680,11 +730,18 @@ function buildGrid() {
   STATS.forEach(s => {
     const row = document.createElement('div');
     row.className = 'stat-row'; row.id = `row-${s.key}`;
+    // Priority badge label
+    let badge = '';
+    if (s.priority === 1) badge = `<span class="priority-badge p1" title="Top priority stat">★ Priority</span>`;
+    if (s.priority === 2) badge = `<span class="priority-badge p2" title="Secondary priority stat">★ Notable</span>`;
     row.innerHTML = `
-      <div class="stat-name"><span class="stat-icon">${s.icon}</span>${s.name}</div>
+      <div class="stat-name">
+        <span class="stat-icon">${s.icon}</span>${s.name}${badge}
+      </div>
       <div class="stat-bar-wrap" id="barwrap-${s.key}">
-        <div class="stat-bar-fill" id="bar-${s.key}" style="width:0%"></div>
+        <div class="stat-bar-fill"    id="bar-${s.key}"      style="width:0%"></div>
         <div class="stat-bar-avg-marker" id="avgmark-${s.key}"></div>
+        <div class="spike-marker"    id="spikemark-${s.key}"></div>
       </div>
       <span class="tip bl" style="display:block">
         <input type="number" class="stat-input" id="input-${s.key}" placeholder="—" min="0" max="999" oninput="recalcAll()">
@@ -701,58 +758,106 @@ function buildGrid() {
 function updateAvg() {
   currentAvg = getAvg();
   const el = document.getElementById('avgDisplay');
-  el.textContent = currentAvg.toFixed(1);
+  el.textContent = currentAvg.toFixed(0);
   el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
   recalcAll();
 }
 
 function recalcAll() {
   let above=0, exact=0, below=0, netSum=0, anyFilled=false, maxVal=1;
-  // Only count active stats (exclude oxygen in 5-stat mode)
+  let hasPrimarySpike = false;   // Health, Stamina, or Damage spike
+  let hasWeightSpike  = false;   // Weight spike
+  const threshold = spikeThreshold();
   const activeStats = STATS.filter(s => !(statMode === 5 && s.key === 'oxygen'));
 
   activeStats.forEach(s => {
     const v = parseFloat(document.getElementById(`input-${s.key}`).value);
     if (!isNaN(v)) maxVal = Math.max(maxVal, v);
   });
-  maxStatSeen = Math.max(maxVal, currentAvg * 1.5);
+  maxStatSeen = Math.max(maxVal, currentAvg * 1.6);
 
   STATS.forEach(s => {
     const isDisabled = statMode === 5 && s.key === 'oxygen';
-    const input = document.getElementById(`input-${s.key}`);
-    const row   = document.getElementById(`row-${s.key}`);
-    const vb    = document.getElementById(`var-${s.key}`);
-    const bar   = document.getElementById(`bar-${s.key}`);
-    const mk    = document.getElementById(`avgmark-${s.key}`);
+    const input    = document.getElementById(`input-${s.key}`);
+    const row      = document.getElementById(`row-${s.key}`);
+    const vb       = document.getElementById(`var-${s.key}`);
+    const bar      = document.getElementById(`bar-${s.key}`);
+    const mk       = document.getElementById(`avgmark-${s.key}`);
+    const spikeMk  = document.getElementById(`spikemark-${s.key}`);
 
-    // Keep oxygen row visually disabled; skip its logic
-    if (isDisabled) {
-      bar.style.width = '0%';
-      vb.textContent = '—';
+    if (isDisabled) { bar.style.width='0%'; vb.textContent='—'; return; }
+
+    mk.style.left = Math.min((currentAvg / maxStatSeen)*100, 100) + '%';
+
+    const val = parseFloat(input.value);
+    if (isNaN(val) || input.value === '') {
+      row.className='stat-row'; vb.textContent='—'; bar.style.width='0%';
+      if(spikeMk) spikeMk.style.opacity='0';
       return;
     }
 
-    mk.style.left = Math.min((currentAvg / maxStatSeen) * 100, 100) + '%';
-    const val = parseFloat(input.value);
-    if (isNaN(val) || input.value === '') { row.className='stat-row'; vb.textContent='—'; bar.style.width='0%'; return; }
     anyFilled = true;
-    const v = val - currentAvg; netSum += v;
-    bar.style.width = Math.min((val / maxStatSeen) * 100, 100) + '%';
-    if (v > 0.05)       { row.className='stat-row above'; vb.textContent=`+${v.toFixed(1)}`; above++; }
-    else if (v < -0.05) { row.className='stat-row below'; vb.textContent=v.toFixed(1); below++; }
-    else                { row.className='stat-row exact'; vb.textContent='±0.0'; exact++; }
+    const v = val - currentAvg;
+    netSum += v;
+    bar.style.width = Math.min((val / maxStatSeen)*100, 100) + '%';
+
+    // Detect spike
+    const isSpike = v >= threshold;
+    if (isSpike && s.priority === 1) hasPrimarySpike = true;
+    if (isSpike && s.priority === 2) hasWeightSpike  = true;
+
+    // Place the golden spike marker at the stat's bar position
+    if (spikeMk) {
+      spikeMk.style.left = Math.min((val / maxStatSeen)*100, 100) + '%';
+    }
+
+    // Assign row class — spikes override above/below colouring
+    if (isSpike && s.priority === 1) {
+      row.className = 'stat-row spike-primary';
+      vb.textContent = `+${v.toFixed(1)}`;
+      above++;
+    } else if (isSpike && s.priority === 2) {
+      row.className = 'stat-row spike-secondary';
+      vb.textContent = `+${v.toFixed(1)}`;
+      above++;
+    } else if (v > 0.05) {
+      row.className = 'stat-row above'; vb.textContent=`+${v.toFixed(1)}`; above++;
+    } else if (v < -0.05) {
+      row.className = 'stat-row below'; vb.textContent=v.toFixed(1); below++;
+    } else {
+      row.className = 'stat-row exact'; vb.textContent='±0.0'; exact++;
+    }
   });
 
   document.getElementById('sumAbove').textContent = above;
   document.getElementById('sumExact').textContent = exact;
   document.getElementById('sumBelow').textContent = below;
-  const ne = document.getElementById('sumNet'), vd = document.getElementById('verdictText');
+
+  const ne = document.getElementById('sumNet');
+  const vd = document.getElementById('verdictText');
+
   if (anyFilled) {
     ne.textContent = (netSum>=0?'+':'') + netSum.toFixed(1);
     ne.style.color = netSum>0 ? 'var(--green)' : netSum<0 ? 'var(--red-bright)' : 'var(--warn)';
-    if (above > below+1)      { vd.textContent='✓ Strong Breed!'; vd.className='verdict-text good'; }
-    else if (below > above+1) { vd.textContent='✕ Cull It';       vd.className='verdict-text bad'; }
-    else                      { vd.textContent='~ Marginal';      vd.className='verdict-text neutral'; }
+
+    if (hasPrimarySpike) {
+      // Top verdict — spike in Health, Stamina or Damage
+      vd.textContent = '⭐ Star Dino!';
+      vd.className   = 'verdict-text star';
+    } else if (hasWeightSpike) {
+      // Secondary verdict — Weight spike only
+      vd.textContent = '⭐ Weight Star';
+      vd.className   = 'verdict-text weight-star';
+    } else if (above > below + 1) {
+      vd.textContent = '✓ Strong Breed!';
+      vd.className   = 'verdict-text good';
+    } else if (below > above + 1) {
+      vd.textContent = '✕ Cull It';
+      vd.className   = 'verdict-text bad';
+    } else {
+      vd.textContent = '~ Marginal';
+      vd.className   = 'verdict-text neutral';
+    }
   } else {
     ne.textContent='—'; ne.style.color='var(--text-muted)';
     vd.textContent='Awaiting Data'; vd.className='verdict-text neutral';
@@ -763,6 +868,7 @@ function adjustLevel(d) {
   const inp = document.getElementById('dinoLevel');
   inp.value = Math.max(1, (parseInt(inp.value)||150) + d); updateAvg();
 }
+
 function clearStats() {
   STATS.forEach(s => {
     if (statMode === 5 && s.key === 'oxygen') return;
@@ -772,8 +878,8 @@ function clearStats() {
     document.getElementById(`bar-${s.key}`).style.width = '0%';
   }); recalcAll();
 }
+
 document.getElementById('dinoLevel').addEventListener('input', updateAvg);
-document.getElementById('useOffset').addEventListener('change', updateAvg);
 buildGrid(); updateAvg();
 
 /* ── DINO BACKGROUND ── */

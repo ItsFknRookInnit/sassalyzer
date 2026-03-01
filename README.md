@@ -2,7 +2,7 @@
 
 > *Dino Breeding · Stat Optimizer · Built by Sass House*
 
-A lightweight, browser-based tool for **ARK: Survival Evolved** players who take their breeding lines seriously. The Sassalyzer calculates the mathematically ideal stat baseline for any tamed or hatched dinosaur and instantly tells you whether each individual stat is above average, average, or wasted — so you can make smarter breeding decisions without doing the maths in your head.
+A lightweight, browser-based tool for **ARK: Survival Evolved** players who take their breeding lines seriously. The Sassalyzer calculates the mathematically ideal stat baseline for any tamed or hatched dinosaur, identifies high-value stat spikes in priority stats, and instantly tells you whether a creature is worth breeding on — so you can make smarter decisions without doing the maths in your head.
 
 No downloads. No backend. Open the page, enter your numbers, get your answer.
 
@@ -10,30 +10,28 @@ No downloads. No backend. Open the page, enter your numbers, get your answer.
 
 ## 🎯 Purpose
 
-In ARK, when a creature spawns or hatches, its total level is distributed across **5 or 6 core stats** by the game's RNG engine. A perfectly optimised creature would have those points evenly — or better yet, weighted towards the stats that actually matter (Health, Damage, Weight). In reality, most creatures dump points into useless stats like Oxygen or Food.
+In ARK, when a creature spawns or hatches, its total level is distributed across **5 or 6 core stats** by the game's RNG engine. Most of the time that distribution is mediocre — but occasionally a creature will land a massive spike in a high-value stat like Health, Stamina, or Damage. These creatures are goldmines for breeding lines even if every other stat is terrible, because you can breed that one exceptional stat into your existing lines.
 
-The Sassalyzer gives you a **mathematical baseline** — the exact average points per stat if distribution were perfect — and compares every stat you enter against that baseline. At a glance you can see:
+The Sassalyzer handles two things:
 
-- Which stats beat the average (worth breeding on)
-- Which stats are wasted (RNG dumped points here)
-- Whether this creature is a **Strong Breed**, **Marginal**, or worth **culling**
+1. **Baseline comparison** — calculates the average points per stat and colour-codes each one so you instantly see what's above or below average
+2. **Spike detection** — identifies when a priority stat (Health, Stamina, Damage) has a significant spike above the baseline and flags the creature as a **Star Dino**, regardless of how the rest of its stats look
 
-Crucially, not all dinos have the same stat pool. Most land dinos — including Rex, Giga, Therizinosaur, and Wyverns — **have an Oxygen stat**, giving them 6 stats total. However, many fully aquatic dinos — like Sarco, Deinosuchus, and Megalodon — **do not have an Oxygen stat**, meaning their points are distributed across only 5 stats. The Sassalyzer accounts for this with a **5-stat mode** that recalculates the baseline accordingly and disables the Oxygen row entirely.
-
-The goal is to help you build cleaner, stronger breeding lines by only selecting creatures with superior point allocation in the stats that matter for your purpose.
+The goal is to stop you from culling creatures that have genuine breeding value hiding behind an otherwise poor stat spread.
 
 ---
 
 ## ✨ Features
 
-- 🔢 **Instant baseline calculator** — enter any dino level and get the average target stat value immediately
-- 🔀 **5-stat / 6-stat mode** — switch between dino types that do or don't have an Oxygen stat; the baseline and comparator update automatically
-- 📊 **Visual stat bars** — each stat renders as a bar with a glowing marker showing exactly where the average falls
-- 🟢🔴 **Colour-coded rows** — green for above average, red for below, grey for exact
+- 🔢 **Instant baseline calculator** — enter any dino level and get the average target stat immediately (rounded down)
+- ⭐ **Priority spike detection** — automatically flags massive Health, Stamina or Damage spikes as Star Dinos
+- 🥈 **Weight spike detection** — separately flags significant Weight spikes, useful for flyers and hauling dinos
+- 🏷️ **Priority stat labels** — Health, Stamina and Damage are marked as Priority stats; Weight as Notable, so you always know which stats matter
+- 🔀 **5-stat / 6-stat mode** — switch for fully aquatic dinos that don't have an Oxygen stat
+- 📊 **Visual stat bars** — each stat renders as a bar with a marker showing exactly where the average falls
+- 🟡🟢🔴 **Colour-coded rows** — gold for spike, green for above average, red for below, grey for exact
 - ➕➖ **Variance display** — shows exactly how many points above or below average each stat is
-- 🏆 **Breeding verdict** — automatic Strong Breed / Marginal / Cull verdict based on your entered stats
-- 🔄 **Two calculation modes** — toggle between `Level ÷ N` and `(Level − 1) ÷ N` depending on your server settings
-- 💬 **Tooltips on everything** — hover over any element for an explanation of what it does
+- 💬 **Tooltips on everything** — hover over any element for a plain-English explanation
 - 🦕 **Floating dino background** — because why not
 - 📱 **Responsive** — works on desktop and mobile browsers
 
@@ -55,16 +53,10 @@ Type the creature's **total level** into the level field at the top. This is the
 
 Use the **▲ / ▼ buttons** to nudge the level up or down by 1.
 
-### Step 2 — Choose Your Calculation Mode
-There is a toggle labelled **"Use (Level − 1) ÷ N"**.
+The **Average Target Per Stat** updates instantly. This is calculated as `Level ÷ stat count`, rounded down — the number of points each stat would have if RNG were perfectly even.
 
-- **Off (default):** Divides the full level by the stat count. Use this for most standard servers.
-- **On:** Subtracts 1 before dividing. Use this if your server treats level 1 as a base level with no stat points assigned.
-
-The **Average Target Per Stat** display updates instantly as you change the level or toggle.
-
-### Step 3 — Select Stat Count Mode
-At the bottom of the configuration panel is a **Stat Count Mode** pill selector with two options:
+### Step 2 — Select Stat Count Mode
+At the bottom of the configuration panel is a **Stat Count Mode** pill selector:
 
 | Mode | When To Use |
 |------|-------------|
@@ -72,113 +64,129 @@ At the bottom of the configuration panel is a **Stat Count Mode** pill selector 
 | **5 Stats (No Oxygen)** | Fully aquatic dinos that **do not have** an Oxygen stat — e.g. Sarco, Deinosuchus, Megalodon, Plesiosaur, Manta, Ichthy |
 
 When you switch to **5 Stats**:
-- The baseline recalculates using `Level ÷ 5` (the average per stat goes up since the same points are spread across fewer stats)
-- The **Oxygen row** in the comparator is greyed out with an "N/A" overlay
-- Oxygen is excluded from all calculations, variance, and the final verdict
-- The **÷ 5 stats** badge appears next to the toggle confirming the active mode
+- The baseline recalculates using `Level ÷ 5` (average goes up since fewer stats share the pool)
+- The **Oxygen row** is greyed out with an N/A overlay and excluded from all calculations
 
-Switching back to **6 Stats** re-enables the Oxygen row instantly.
+> 💡 **Not sure which mode?** Check the dino's stat panel in-game. If Oxygen is listed, use 6 Stats. If it isn't there at all, use 5 Stats.
 
-> 💡 **Not sure which mode to use?** Check the dino's stat panel in-game. If you can see an Oxygen value listed, use **6 Stats**. If there is no Oxygen entry at all, use **5 Stats**.
+### Step 3 — Enter the Stat Points
+In the **Stat Comparator** grid, type the **wild/bred stat point values** into the input fields for each active stat.
 
-### Step 4 — Enter the Stat Points
-In the **Stat Comparator** grid, type the **wild/bred stat point values** for each active stat into the input fields.
+> ⚠️ These are the **base stat point counts**, not the final multiplied values shown in-game. You can find them by checking the creature's detailed stat breakdown. Mods like Dino Storage or S+ make this easier to view.
 
-> ⚠️ These are the **base stat point counts**, not the final in-game values. You can find them by opening the creature's inventory and inspecting the stat breakdown. Some servers require mods like Dino Storage or S+ to view these easily.
+The stats tracked, and their priority levels:
 
-The stats tracked are:
+| Stat | Priority | Why It Matters |
+|------|----------|----------------|
+| ❤️ **Health** | ⭐ Top Priority | Total hit points. A spike here is always worth breeding on |
+| ⚡ **Stamina** | ⭐ Top Priority | Energy for combat and travel. A spike is highly valuable |
+| ◎ **Oxygen** | — Dump Stat | Breath capacity. Spikes here are worthless for breeding |
+| ⬟ **Food** | — Dump Stat | Hunger rate. Not a breeding priority at all |
+| ⊞ **Weight** | 🥈 Notable | Carry capacity. Especially valuable for flyers and hauling dinos |
+| ⚔️ **Damage** | ⭐ Top Priority | Melee multiplier. A spike here is always worth breeding on |
 
-| Stat | 6-stat dinos | 5-stat dinos | Why It Matters |
-|------|:---:|:---:|----------------|
-| ❤️ **Health** | ✅ | ✅ | Total hit points. Critical for tanks and general purpose tames |
-| ⚡ **Stamina** | ✅ | ✅ | Energy for sprinting and attacking. Low stamina = dino stops mid-fight |
-| ◎ **Oxygen** | ✅ | ❌ | Underwater breath. Present on most dinos; absent on fully aquatic ones |
-| ⬟ **Food** | ✅ | ✅ | Hunger rate. Rarely a breeding priority |
-| ⊞ **Weight** | ✅ | ✅ | Carry capacity. Essential for hauling dinos (Argent, Anky, Castoroides) |
-| ⚔️ **Damage** | ✅ | ✅ | Melee multiplier. Critical for combat tames |
+### Step 4 — Read the Results
 
-### Step 5 — Read the Results
+Each row colour-codes in real time:
 
-As you type, each row updates in real time:
+| Row Colour | Meaning |
+|------------|---------|
+| 🟡 **Gold glow** | This stat has a major spike in a priority stat — this creature is a **Star Dino** |
+| 🥈 **Silver** | Major spike in Weight — valuable for flyers and haulers |
+| 🟢 **Green** | Above average — good but not exceptional |
+| ⚪ **Grey** | Exactly average |
+| 🔴 **Red** | Below average — points wasted here |
+| 🌫️ **Faded/disabled** | Stat not applicable (Oxygen in 5-stat mode) |
 
-- **Distribution bar** — visualises how many points this stat has relative to the others. The glowing red line marks the average target.
-- **Variance column** — shows `+X.X` if above average, `−X.X` if below, `±0.0` if exact.
-- **Row colour** — green border = above average, red border = below, grey = exact, dark/faded = disabled (N/A).
+The **distribution bar** shows the stat's points relative to all others. The red line marks the average target.
+
+The **variance column** shows `+X.X` if above average, `−X.X` if below, `±0.0` if exact.
+
+### Step 5 — Check the Verdict
+
+The verdict badge at the bottom right gives you the overall breeding assessment:
+
+| Verdict | Meaning |
+|---------|---------|
+| ⭐ **Star Dino!** | Major spike detected in Health, Stamina or Damage — **keep and breed this regardless of overall spread** |
+| ⭐ **Weight Star** | Major Weight spike — valuable for flyers and haulers even if other stats are poor |
+| ✓ **Strong Breed** | Good overall spread above average, no individual spike |
+| **~ Marginal** | Roughly average across the board — situational value |
+| ✕ **Cull It** | Mostly below average with no redeeming spike — not worth keeping |
+
+> A Star Dino with terrible overall stats is still more valuable than a Strong Breed with no spike. The spike is what you breed into your lines.
 
 ### Step 6 — Check the Summary
 
-The summary bar at the bottom shows:
+The summary bar below the comparator shows:
 
 | Field | What It Means |
 |-------|---------------|
-| **Above Avg** | Number of active stats beating the baseline |
-| **At Average** | Active stats that exactly hit the average |
-| **Below Avg** | Active stats wasting points on dump categories |
-| **Net Points** | Total surplus/deficit across all entered active stats |
-| **Verdict** | `✓ Strong Breed` / `~ Marginal` / `✕ Cull It` |
-
-**Verdict logic:**
-- **Strong Breed** — more stats are above average than below (by more than 1)
-- **Cull It** — more stats are below average than above (by more than 1)
-- **Marginal** — roughly balanced; situational depending on which stats are above
+| **Above Avg** | Count of stats beating the baseline (includes spikes) |
+| **At Average** | Stats that hit exactly the average |
+| **Below Avg** | Stats below average — wasted RNG points |
+| **Net Points** | Total surplus/deficit across all active entered stats |
 
 ### Step 7 — Reset
-Click **↺ Clear All Stats** to wipe all active input fields and start fresh for a new creature. Disabled stats (e.g. Oxygen in 5-stat mode) are not affected.
+Click **↺ Clear All Stats** to wipe all active inputs and start fresh. Disabled stats (Oxygen in 5-stat mode) are not affected.
 
 ---
 
 ## 🧮 The Maths
 
-**6-stat dinos (most land/air dinos, default):**
+**Baseline average (6-stat dinos):**
 ```
-Average Stat = Level ÷ 6
-```
-
-**5-stat dinos (fully aquatic dinos, no Oxygen):**
-```
-Average Stat = Level ÷ 5
+Average Stat = floor(Level ÷ 6)
 ```
 
-With the offset toggle enabled, subtract 1 from the level first:
+**Baseline average (5-stat dinos, no Oxygen):**
 ```
-Average Stat = (Level − 1) ÷ N    (where N = 6 or 5)
-```
-
-**Example A — Level 150 Rex (6-stat mode):**
-```
-150 ÷ 6 = 25.0 points per stat (average target)
-
-Health:  32  → +7.0  ✅ above average
-Stamina: 18  → -7.0  ❌ below average
-Oxygen:  14  → -11.0 ❌ below average (dump stat, acceptable for land dino)
-Food:    20  → -5.0  ❌ below average (dump stat, acceptable)
-Weight:  28  → +3.0  ✅ above average
-Damage:  38  → +13.0 ✅ above average
-
-Net: +7.0  →  Verdict: ✓ Strong Breed
+Average Stat = floor(Level ÷ 5)
 ```
 
-**Example B — Level 150 Sarco (5-stat mode, no Oxygen):**
+**Spike threshold:**
 ```
-150 ÷ 5 = 30.0 points per stat (average target)
+Spike = stat is at least 30% above average, and at least 6 points above average
+      = variance >= max(6, floor(average × 0.3))
+```
 
-Health:  38  → +8.0  ✅ above average
-Stamina: 22  → -8.0  ❌ below average
+**Example A — Level 150 Rex (6-stat), Star Dino result:**
+```
+floor(150 ÷ 6) = 25 points per stat (average)
+Spike threshold = max(6, floor(25 × 0.3)) = max(6, 7) = 7 points above average
+
+Health:  38  → +13  ⭐ SPIKE — 13 >= 7, priority stat  → ⭐ Star Dino!
+Stamina: 16  → -9   ❌ below average
+Oxygen:  12  → -13  ❌ below average (dump stat)
+Food:    18  → -7   ❌ below average (dump stat)
+Weight:  24  → -1   ≈ average
+Damage:  42  → +17  ⭐ SPIKE — 17 >= 7, priority stat  → confirms Star Dino!
+
+Verdict: ⭐ Star Dino! (two priority spikes — exceptional breeding candidate)
+```
+
+**Example B — Level 150 Sarco (5-stat, no Oxygen):**
+```
+floor(150 ÷ 5) = 30 points per stat (average)
+Spike threshold = max(6, floor(30 × 0.3)) = 9 points above average
+
+Health:  32  → +2   ✅ above average, not a spike
+Stamina: 20  → -10  ❌ below average
 Oxygen:  N/A → disabled
-Food:    24  → -6.0  ❌ below average (dump stat, acceptable)
-Weight:  32  → +2.0  ✅ above average
-Damage:  34  → +4.0  ✅ above average
+Food:    22  → -8   ❌ below average (dump stat)
+Weight:  50  → +20  ⭐ SPIKE — 20 >= 9, but Weight is secondary priority
+Damage:  26  → -4   ❌ below average
 
-Net: +8.0  →  Verdict: ✓ Strong Breed
+Verdict: ⭐ Weight Star (big Weight spike, valuable for hauling — but no primary spike)
 ```
 
-> Notice that the same raw stat numbers produce a higher average target in 5-stat mode (30.0 vs 25.0) because the same pool of points is split across fewer stats. Using the wrong mode will give you an inaccurate baseline and a misleading verdict.
+> **Why floor?** Rounding down gives a slightly conservative baseline — it's better to slightly underestimate the average than to mark a genuinely good stat as average.
 
 ---
 
 ## 🐊 Common 5-Stat Dinos (No Oxygen)
 
-These fully aquatic dinos **do not have** an Oxygen stat — use **5 Stats mode** for them:
+These fully aquatic dinos **do not have** an Oxygen stat — use **5 Stats mode**:
 
 `Sarco` · `Deinosuchus` · `Megalodon` · `Plesiosaur` · `Mosasaurus` · `Manta` · `Ichthyosaurus` · `Electrophorus` · `Tusoteuthis` · `Cnidaria`
 
@@ -196,6 +204,8 @@ These dinos **do have** an Oxygen stat — use the default **6 Stats mode**:
 
 - **Pure HTML / CSS / JavaScript** — zero dependencies, no frameworks, no build step
 - **Single file** (`index.html`) — runs locally or from any static host
+- Spike threshold scales dynamically with level — no hardcoded values
+- Priority system encoded per-stat: `1` = top priority, `2` = secondary (Weight), `0` = dump stat
 - SVG character art drawn inline
 - Animated SVG dino silhouettes generated procedurally via JavaScript
 - Custom CSS tooltip system (no libraries)
@@ -228,14 +238,24 @@ sassalyzer/
 
 - Save/load dino profiles between sessions
 - Multi-dino comparison view (compare two creatures side by side)
-- Presets for common dino types (combat Rex, weight Argent, etc.) that auto-set the correct stat mode and highlight priority stats
-- Colour-weight system — mark certain stats as priority so the verdict accounts for *which* stats are above average, not just how many
+- Dino name dropdown that auto-sets the correct stat mode and highlights the right priority stats for that species
+- Adjustable spike threshold sensitivity (strict / standard / relaxed)
 - Export to image / shareable link
-- Auto-detect stat count from a dino name dropdown
 
 ---
 
 ## 📋 Changelog
+
+### v1.2
+- Added **priority spike detection system** — Health, Stamina and Damage are tracked as top priority stats; a significant spike in any of them overrides the overall verdict
+- Added **Weight spike detection** — flagged separately as a secondary priority, particularly useful for flyers and hauling dinos
+- New **⭐ Star Dino!** verdict (gold, pulsing glow) — fires when any top priority stat has a major spike, regardless of overall stat spread
+- New **⭐ Weight Star** verdict (silver) — fires when Weight has a major spike and no primary spike is present
+- Spike threshold scales dynamically with level: `max(6, floor(average × 0.3))` — so the bar rises appropriately as dino level increases
+- Priority and Notable **stat badges** added to Health, Stamina, Damage and Weight rows so users always know which stats matter
+- Gold and silver row highlight styles added for spike rows
+- Removed the **"Use (Level − 1) ÷ 6"** offset toggle — simplified to a clean floor division that covers the vast majority of use cases without confusion
+- Average stat display now shows a rounded-down integer instead of a decimal
 
 ### v1.1
 - Added **5-stat mode** for fully aquatic dinos that do not have an Oxygen stat (e.g. Sarco, Deinosuchus, Megalodon)
@@ -248,7 +268,7 @@ sassalyzer/
 ### v1.0
 - Initial release
 - 6-stat comparator with real-time variance and colour coding
-- Breeding verdict system
+- Breeding verdict system (Strong Breed / Marginal / Cull)
 - Floating dino background
 - Full tooltip system
 - Pistola & Keebs character branding
@@ -263,4 +283,4 @@ Keebs likes giraffes.
 
 ---
 
-*No dinos were harmed in the making of this tool. Several were culled.*
+*No dinos were harmed in the making of this tool. Several were culled. One was a Star Dino.*
