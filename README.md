@@ -18,7 +18,7 @@ The Sassalyzer gives you a **mathematical baseline** — the exact average point
 - Which stats are wasted (RNG dumped points here)
 - Whether this creature is a **Strong Breed**, **Marginal**, or worth **culling**
 
-Crucially, not all dinos have the same stat pool. Many dinos — including Rex, Giga, Therizinosaur, and Wyverns — **do not have an Oxygen stat**, meaning their points are distributed across only 5 stats. The Sassalyzer accounts for this with a dedicated **5-stat mode** that recalculates the baseline accordingly and disables the Oxygen row entirely.
+Crucially, not all dinos have the same stat pool. Most land dinos — including Rex, Giga, Therizinosaur, and Wyverns — **have an Oxygen stat**, giving them 6 stats total. However, many fully aquatic dinos — like Sarco, Deinosuchus, and Megalodon — **do not have an Oxygen stat**, meaning their points are distributed across only 5 stats. The Sassalyzer accounts for this with a **5-stat mode** that recalculates the baseline accordingly and disables the Oxygen row entirely.
 
 The goal is to help you build cleaner, stronger breeding lines by only selecting creatures with superior point allocation in the stats that matter for your purpose.
 
@@ -68,18 +68,18 @@ At the bottom of the configuration panel is a **Stat Count Mode** pill selector 
 
 | Mode | When To Use |
 |------|-------------|
-| **6 Stats** (default) | Most aquatic or amphibious dinos that have an Oxygen stat — e.g. Spino, Baryonyx, Sarco, Megalodon, Plesiosaur |
-| **5 Stats (No Oxygen)** | Dinos that do not have an Oxygen stat — e.g. Rex, Giga, Therizinosaur, Carno, Allosaurus, Wyvern, Rock Drake, Managarmr |
+| **6 Stats** (default) | Most land, air, and amphibious dinos that **have** an Oxygen stat — e.g. Rex, Giga, Therizinosaur, Carno, Wyvern, Raptor, Spino, Baryonyx |
+| **5 Stats (No Oxygen)** | Fully aquatic dinos that **do not have** an Oxygen stat — e.g. Sarco, Deinosuchus, Megalodon, Plesiosaur, Manta, Ichthy |
 
 When you switch to **5 Stats**:
-- The baseline recalculates using `Level ÷ 5` (the average per stat goes up)
+- The baseline recalculates using `Level ÷ 5` (the average per stat goes up since the same points are spread across fewer stats)
 - The **Oxygen row** in the comparator is greyed out with an "N/A" overlay
 - Oxygen is excluded from all calculations, variance, and the final verdict
 - The **÷ 5 stats** badge appears next to the toggle confirming the active mode
 
-Switching back to **6 Stats** re-enables the Oxygen row instantly and clears any stale Oxygen input.
+Switching back to **6 Stats** re-enables the Oxygen row instantly.
 
-> 💡 **Not sure which mode to use?** If you can see an Oxygen value in the dino's stat panel in-game, use 6 Stats. If there's no Oxygen entry at all, use 5 Stats.
+> 💡 **Not sure which mode to use?** Check the dino's stat panel in-game. If you can see an Oxygen value listed, use **6 Stats**. If there is no Oxygen entry at all, use **5 Stats**.
 
 ### Step 4 — Enter the Stat Points
 In the **Stat Comparator** grid, type the **wild/bred stat point values** for each active stat into the input fields.
@@ -92,7 +92,7 @@ The stats tracked are:
 |------|:---:|:---:|----------------|
 | ❤️ **Health** | ✅ | ✅ | Total hit points. Critical for tanks and general purpose tames |
 | ⚡ **Stamina** | ✅ | ✅ | Energy for sprinting and attacking. Low stamina = dino stops mid-fight |
-| ◎ **Oxygen** | ✅ | ❌ | Underwater breath. Not present on many land/air dinos |
+| ◎ **Oxygen** | ✅ | ❌ | Underwater breath. Present on most dinos; absent on fully aquatic ones |
 | ⬟ **Food** | ✅ | ✅ | Hunger rate. Rarely a breeding priority |
 | ⊞ **Weight** | ✅ | ✅ | Carry capacity. Essential for hauling dinos (Argent, Anky, Castoroides) |
 | ⚔️ **Damage** | ✅ | ✅ | Melee multiplier. Critical for combat tames |
@@ -129,22 +129,36 @@ Click **↺ Clear All Stats** to wipe all active input fields and start fresh fo
 
 ## 🧮 The Maths
 
-**6-stat dinos (default):**
+**6-stat dinos (most land/air dinos, default):**
 ```
 Average Stat = Level ÷ 6
 ```
 
-**5-stat dinos (No Oxygen mode):**
+**5-stat dinos (fully aquatic dinos, no Oxygen):**
 ```
 Average Stat = Level ÷ 5
 ```
 
 With the offset toggle enabled, subtract 1 from the level first:
 ```
-Average Stat = (Level − 1) ÷ N    (where N = 5 or 6)
+Average Stat = (Level − 1) ÷ N    (where N = 6 or 5)
 ```
 
-**Example A — Level 150 Rex (5-stat mode):**
+**Example A — Level 150 Rex (6-stat mode):**
+```
+150 ÷ 6 = 25.0 points per stat (average target)
+
+Health:  32  → +7.0  ✅ above average
+Stamina: 18  → -7.0  ❌ below average
+Oxygen:  14  → -11.0 ❌ below average (dump stat, acceptable for land dino)
+Food:    20  → -5.0  ❌ below average (dump stat, acceptable)
+Weight:  28  → +3.0  ✅ above average
+Damage:  38  → +13.0 ✅ above average
+
+Net: +7.0  →  Verdict: ✓ Strong Breed
+```
+
+**Example B — Level 150 Sarco (5-stat mode, no Oxygen):**
 ```
 150 ÷ 5 = 30.0 points per stat (average target)
 
@@ -158,31 +172,23 @@ Damage:  34  → +4.0  ✅ above average
 Net: +8.0  →  Verdict: ✓ Strong Breed
 ```
 
-**Example B — Level 150 Spino (6-stat mode):**
-```
-150 ÷ 6 = 25.0 points per stat (average target)
-
-Health:  32  → +7.0  ✅ above average
-Stamina: 18  → -7.0  ❌ below average
-Oxygen:  14  → -11.0 ❌ below average (dump stat, acceptable)
-Food:    20  → -5.0  ❌ below average (dump stat, acceptable)
-Weight:  28  → +3.0  ✅ above average
-Damage:  38  → +13.0 ✅ above average
-
-Net: +7.0  →  Verdict: ✓ Strong Breed
-```
-
-> Notice how the same Rex stats would look very different if accidentally evaluated in 6-stat mode — the baseline would be lower (25.0 vs 30.0), potentially inflating how "good" a dino looks. Always make sure you're in the right mode.
+> Notice that the same raw stat numbers produce a higher average target in 5-stat mode (30.0 vs 25.0) because the same pool of points is split across fewer stats. Using the wrong mode will give you an inaccurate baseline and a misleading verdict.
 
 ---
 
-## 🦕 Common 5-Stat Dinos (No Oxygen)
+## 🐊 Common 5-Stat Dinos (No Oxygen)
 
-These dinos do **not** have an Oxygen stat — use **5 Stats mode** for them:
+These fully aquatic dinos **do not have** an Oxygen stat — use **5 Stats mode** for them:
 
-`Rex` · `Giganotosaurus` · `Therizinosaur` · `Carnotaurus` · `Allosaurus` · `Yutyrannus` · `Spinosaur`* · `Baryonyx`* · `Wyvern` · `Rock Drake` · `Managarmr` · `Snow Owl` · `Shadowmane` · `Noglin` · `Deinonychus` · `Megalosaurus`
+`Sarco` · `Deinosuchus` · `Megalodon` · `Plesiosaur` · `Mosasaurus` · `Manta` · `Ichthyosaurus` · `Electrophorus` · `Tusoteuthis` · `Cnidaria`
 
-> \* *Spino and Baryonyx are semi-aquatic and **do** have Oxygen on some server configs — check in-game to be sure.*
+## 🦖 Common 6-Stat Dinos (Have Oxygen)
+
+These dinos **do have** an Oxygen stat — use the default **6 Stats mode**:
+
+`Rex` · `Giganotosaurus` · `Therizinosaur` · `Carnotaurus` · `Allosaurus` · `Yutyrannus` · `Spinosaur` · `Baryonyx` · `Raptor` · `Wyvern` · `Rock Drake` · `Managarmr` · `Snow Owl` · `Shadowmane` · `Deinonychus` · `Megalosaurus` · `Argentavis` · `Ankylosaurus`
+
+> 💡 When in doubt, check the dino's stat screen in-game — if Oxygen appears, use 6-stat mode.
 
 ---
 
@@ -232,10 +238,10 @@ sassalyzer/
 ## 📋 Changelog
 
 ### v1.1
-- Added **5-stat mode** for dinos without an Oxygen stat
+- Added **5-stat mode** for fully aquatic dinos that do not have an Oxygen stat (e.g. Sarco, Deinosuchus, Megalodon)
 - Stat count mode pill selector added to the configuration panel
-- Oxygen row now disables with an N/A overlay when 5-stat mode is active
-- Baseline calculation dynamically switches between `÷ 5` and `÷ 6`
+- Oxygen row disables with an N/A overlay when 5-stat mode is active
+- Baseline calculation dynamically switches between `÷ 6` (default) and `÷ 5`
 - Clear All Stats respects the active mode and skips disabled rows
 - Tooltips updated throughout to reflect stat count context
 
