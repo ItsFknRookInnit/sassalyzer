@@ -1,3 +1,8 @@
+To reflect the visual overhaul and the new background integration we implemented for the **Sassalyzer**, I have updated the character descriptions and added a new **v1.3** entry to the changelog.
+
+You can copy and paste the entire block below into your `README.md` file:
+
+```markdown
 # 🦖 Sass House Sassalyzer
 
 > *Dino Breeding · Stat Optimizer · Built by Sass House*
@@ -92,3 +97,77 @@ The stats tracked, and their priority levels:
 ## 🧮 The Maths
 
 **Baseline average (6-stat dinos):**
+
+```
+
+Average Stat = floor(Level ÷ 6)
+
+```
+
+**Baseline average (5-stat dinos, no Oxygen):**
+
+```
+
+Average Stat = floor(Level ÷ 5)
+
+```
+
+**Spike threshold:**
+
+```
+
+Spike = stat is at least 30% above average, and at least 6 points above average
+= variance >= max(6, floor(average × 0.3))
+
+```
+
+---
+
+## 📋 Changelog
+
+### v1.3
+- **Integrated Custom Streaming Room Background** — Added a high-detail gaming setup background featuring Pistola and Keebs in their natural habitat.
+- **Glassmorphism UI System** — Updated all panels and cards to use semi-transparent backgrounds (`rgba`), allowing the environment to show through while maintaining clarity.
+- **Contrast & Readability Enhancements** — Added a global dark overlay to ensure the UI remains the primary focus and stats are easy to read against the detailed background.
+- **Visual Refresh** — Updated Keebs' character palette to a light navy blue to match the new streaming aesthetic.
+
+### v1.2
+- Added **priority spike detection system** — Health, Stamina and Damage are tracked as top priority stats; a significant spike in any of them overrides the overall verdict.
+- Added **Weight spike detection** — flagged separately as a secondary priority, particularly useful for flyers and hauling dinos.
+- New **⭐ Star Dino!** verdict (gold, pulsing glow) — fires when any top priority stat has a major spike, regardless of overall stat spread.
+- New **⭐ Weight Star** verdict (silver) — fires when Weight has a major spike and no primary spike is present.
+- Spike threshold scales dynamically with level: `max(6, floor(average × 0.3))` — so the bar rises appropriately as dino level increases.
+- Priority and Notable **stat badges** added to Health, Stamina, Damage and Weight rows so users always know which stats matter.
+- Gold and silver row highlight styles added for spike rows.
+- Removed the **"Use (Level − 1) ÷ 6"** offset toggle — simplified to a clean floor division that covers the vast majority of use cases without confusion.
+- Average stat display now shows a rounded-down integer instead of a decimal.
+
+### v1.1
+- Added **5-stat mode** for fully aquatic dinos that do not have an Oxygen stat (e.g. Sarco, Deinosuchus, Megalodon).
+- Stat count mode pill selector added to the configuration panel.
+- Oxygen row disables with an N/A overlay when 5-stat mode is active.
+- Baseline calculation dynamically switches between `÷ 6` (default) and `÷ 5`.
+- Clear All Stats respects the active mode and skips disabled rows.
+- Tooltips updated throughout to reflect stat count context.
+
+### v1.0
+- Initial release.
+- 6-stat comparator with real-time variance and colour coding.
+- Breeding verdict system (Strong Breed / Marginal / Cull).
+- Floating dino background.
+- Full tooltip system.
+- Pistola & Keebs character branding.
+
+---
+
+## 👾 Credits
+
+Built for the **Sass House** ARK tribe.
+Featuring **Pistola** and **Keebs**.
+Keebs likes giraffes.
+
+---
+
+*No dinos were harmed in the making of this tool. Several were culled. One was a Star Dino.*
+
+```
