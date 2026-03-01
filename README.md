@@ -1,8 +1,3 @@
-To reflect the visual overhaul and the new background integration we implemented for the **Sassalyzer**, I have updated the character descriptions and added a new **v1.3** entry to the changelog.
-
-You can copy and paste the entire block below into your `README.md` file:
-
-```markdown
 # 🦖 Sass House Sassalyzer
 
 > *Dino Breeding · Stat Optimizer · Built by Sass House*
@@ -169,5 +164,3 @@ Keebs likes giraffes.
 ---
 
 *No dinos were harmed in the making of this tool. Several were culled. One was a Star Dino.*
-
-```
