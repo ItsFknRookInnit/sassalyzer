@@ -8,9 +8,10 @@
 <style>
   :root {
     --bg:         #111118;
-    --bg-panel:   #18181f;
-    --bg-card:    #1d1d28;
-    --bg-input:   #0e0e15;
+    /* Updated backgrounds to use transparency for the "Glassmorphism" effect */
+    --bg-panel:   rgba(24, 24, 31, 0.88); 
+    --bg-card:    rgba(29, 29, 40, 0.75);
+    --bg-input:   rgba(14, 14, 21, 0.8);
     --border:     #2a2a3a;
     --red:        #e03030;
     --red-bright: #ff4444;
@@ -40,29 +41,35 @@
     --silver-bg:  rgba(168,196,216,0.06);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
+  
   body {
     font-family:'Nunito',sans-serif;
-    background:var(--bg); color:var(--text);
+    /* Reference the generated background image */
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color:var(--text);
     min-height:100vh; overflow-x:hidden; position:relative;
   }
+
+  /* Dark overlay to ensure UI elements and text remain high-contrast */
   body::before {
     content:''; position:fixed; inset:0;
-    background-image:
-      radial-gradient(circle,rgba(220,48,48,0.055) 1px,transparent 1px),
-      radial-gradient(circle,rgba(79,195,247,0.03) 1px,transparent 1px);
-    background-size:55px 55px,85px 85px;
-    background-position:0 0,28px 28px;
+    background: rgba(10, 10, 15, 0.78);
     pointer-events:none; z-index:0;
   }
+
+  /* Glowing corners logic preserved but adjusted for image depth */
   body::after {
     content:''; position:fixed; inset:0;
     background:
-      radial-gradient(ellipse 900px 500px at 5% 0%,rgba(220,48,48,0.07) 0%,transparent 55%),
-      radial-gradient(ellipse 700px 400px at 95% 100%,rgba(79,195,247,0.06) 0%,transparent 55%);
+      radial-gradient(ellipse 900px 500px at 5% 0%,rgba(220,48,48,0.12) 0%,transparent 55%),
+      radial-gradient(ellipse 700px 400px at 95% 100%,rgba(79,195,247,0.1) 0%,transparent 55%);
     pointer-events:none; z-index:0;
   }
+
   #dino-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
   .bg-dino { position:absolute; opacity:0; animation:dinoDrift linear infinite; }
+  
   @keyframes dinoDrift {
     0%   { opacity:0;              transform:translateY(30px)  rotate(var(--rot)); }
     8%   { opacity:var(--op); }
@@ -128,6 +135,7 @@
     background:var(--bg-panel); border:1px solid var(--border);
     border-radius:14px; padding:22px; margin-bottom:16px;
     position:relative; overflow:hidden; animation:slideUp .4s ease both;
+    backdrop-filter: blur(10px); /* Adds a subtle blur to background through the panel */
   }
   .panel:nth-child(2){animation-delay:.07s} .panel:nth-child(3){animation-delay:.14s}
   @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
@@ -175,16 +183,6 @@
   .avg-value-num { font-family:'Fredoka One',cursive; font-size:38px; color:var(--red-bright); line-height:1; transition:all .2s; }
   .avg-value-num.pulse { animation:numPop .3s ease; }
   @keyframes numPop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12);color:var(--blue)} }
-  .toggle-row { display:flex; align-items:center; gap:10px; margin-top:14px; }
-  .toggle-label { font-size:12px; color:var(--text-muted); font-weight:700; cursor:pointer; user-select:none; }
-  .toggle {
-    appearance:none; width:36px; height:20px; background:var(--bg-input);
-    border:2px solid var(--border); border-radius:10px; cursor:pointer;
-    position:relative; transition:all .2s; flex-shrink:0;
-  }
-  .toggle::after { content:''; position:absolute; left:2px;top:2px; width:12px;height:12px; border-radius:50%; background:var(--text-muted); transition:all .2s; }
-  .toggle:checked { background:var(--red-bg); border-color:var(--red); }
-  .toggle:checked::after { left:18px; background:var(--red-bright); }
 
   /* ── STAT GRID ── */
   .grid-header {
@@ -222,17 +220,9 @@
   }
   .stat-input::-webkit-inner-spin-button,.stat-input::-webkit-outer-spin-button{-webkit-appearance:none}
   .stat-input:focus { border-color:var(--red); box-shadow:0 0 0 2px var(--red-glow); }
-  .stat-row.above .stat-input:focus { border-color:var(--green); }
-  .stat-row.below .stat-input:focus { border-color:var(--red-bright); }
   .variance-badge { font-family:'Share Tech Mono',monospace; font-size:14px; font-weight:700; text-align:right; color:var(--text-dim); padding-right:4px; transition:color .2s; }
   .stat-row.above .variance-badge { color:var(--green); }
   .stat-row.below .variance-badge { color:var(--red-bright); }
-  .stat-row.exact .variance-badge { color:var(--grey); }
-
-  /* ── LEGEND ── */
-  .legend { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin-bottom:14px; }
-  .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; letter-spacing:1px; color:var(--text-muted); text-transform:uppercase; font-weight:700; }
-  .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 
   /* ── SUMMARY ── */
   .summary-panel {
@@ -240,6 +230,7 @@
     padding:18px 24px; display:flex; gap:20px; flex-wrap:wrap;
     align-items:center; justify-content:space-between; margin-bottom:16px;
     position:relative; overflow:hidden; animation:slideUp .4s .2s ease both;
+    backdrop-filter: blur(10px);
   }
   .summary-panel::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,var(--red),var(--warn),var(--blue)); }
   .summary-stat { display:flex; flex-direction:column; gap:2px; align-items:center; }
@@ -254,130 +245,42 @@
   .verdict-text.good    { color:var(--green);      background:var(--green-bg); border:2px solid var(--green-dim); }
   .verdict-text.bad     { color:var(--red-bright);  background:var(--red-bg);   border:2px solid var(--red-dim); }
   .verdict-text.neutral { color:var(--text-muted);  background:var(--grey-bg);  border:2px solid var(--grey); }
-  .verdict-text.star    {
-    color:var(--gold); background:var(--gold-bg); border:2px solid var(--gold-dim);
-    box-shadow:0 0 18px var(--gold-glow);
-    animation:starPulse 2s ease-in-out infinite;
-  }
-  .verdict-text.weight-star {
-    color:var(--silver); background:var(--silver-bg); border:2px solid var(--silver-dim);
-  }
-  @keyframes starPulse {
-    0%,100% { box-shadow:0 0 12px var(--gold-glow); }
-    50%      { box-shadow:0 0 28px var(--gold-glow), 0 0 8px rgba(255,215,0,0.3); }
-  }
+  .verdict-text.star    { color:var(--gold); background:var(--gold-bg); border:2px solid var(--gold-dim); box-shadow:0 0 18px var(--gold-glow); animation:starPulse 2s ease-in-out infinite; }
+  .verdict-text.weight-star { color:var(--silver); background:var(--silver-bg); border:2px solid var(--silver-dim); }
+  @keyframes starPulse { 0%,100% { box-shadow:0 0 12px var(--gold-glow); } 50% { box-shadow:0 0 28px var(--gold-glow), 0 0 8px rgba(255,215,0,0.3); } }
 
-  /* ── PRIORITY / SPIKE STAT ROWS ── */
-  .stat-row.spike-primary {
-    border-color: var(--gold-dim) !important;
-    background: var(--gold-bg) !important;
-    box-shadow: 0 0 14px var(--gold-glow), inset 0 0 0 1px rgba(255,215,0,0.08);
-  }
-  .stat-row.spike-primary .stat-bar-fill {
-    background: linear-gradient(90deg, #b89a0a, var(--gold)) !important;
-  }
+  /* ── SPIKE / PRIORITY ── */
+  .stat-row.spike-primary { border-color: var(--gold-dim) !important; background: var(--gold-bg) !important; box-shadow: 0 0 14px var(--gold-glow), inset 0 0 0 1px rgba(255,215,0,0.08); }
+  .stat-row.spike-primary .stat-bar-fill { background: linear-gradient(90deg, #b89a0a, var(--gold)) !important; }
   .stat-row.spike-primary .variance-badge { color:var(--gold) !important; }
-  .stat-row.spike-secondary {
-    border-color: var(--silver-dim) !important;
-    background: var(--silver-bg) !important;
-  }
-  .stat-row.spike-secondary .stat-bar-fill {
-    background: linear-gradient(90deg, var(--silver-dim), var(--silver)) !important;
-  }
-  .stat-row.spike-secondary .variance-badge { color:var(--silver) !important; }
-
-  .priority-badge {
-    font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1px;
-    padding:2px 6px; border-radius:8px; text-transform:uppercase;
-    font-weight:700; margin-left:4px; flex-shrink:0;
-  }
+  .stat-row.spike-secondary { border-color: var(--silver-dim) !important; background: var(--silver-bg) !important; }
+  .stat-row.spike-secondary .stat-bar-fill { background: linear-gradient(90deg, var(--silver-dim), var(--silver)) !important; }
+  .priority-badge { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1px; padding:2px 6px; border-radius:8px; text-transform:uppercase; font-weight:700; margin-left:4px; flex-shrink:0; }
   .priority-badge.p1 { color:var(--gold);   background:var(--gold-bg);   border:1px solid var(--gold-dim); }
   .priority-badge.p2 { color:var(--silver); background:var(--silver-bg); border:1px solid var(--silver-dim); }
 
-  .spike-marker {
-    position:absolute; top:-6px; bottom:-6px; width:3px;
-    background:var(--gold); border-radius:2px; opacity:0;
-    transition:left .3s, opacity .3s;
-    box-shadow:0 0 8px var(--gold-glow);
-    pointer-events:none;
-  }
-  .stat-row.spike-primary .spike-marker,
-  .stat-row.spike-secondary .spike-marker { opacity:0.85; }
-
   /* ── CLEAR BTN ── */
-  .btn-clear {
-    background:transparent; border:2px solid var(--border); color:var(--text-muted);
-    font-family:'Fredoka One',cursive; font-size:14px; letter-spacing:2px;
-    text-transform:uppercase; padding:10px 28px; border-radius:30px;
-    cursor:pointer; transition:all .2s; display:block; margin:0 auto;
-  }
+  .btn-clear { background:transparent; border:2px solid var(--border); color:var(--text-muted); font-family:'Fredoka One',cursive; font-size:14px; letter-spacing:2px; text-transform:uppercase; padding:10px 28px; border-radius:30px; cursor:pointer; transition:all .2s; display:block; margin:0 auto; }
   .btn-clear:hover { border-color:var(--red-dim); color:var(--red-bright); background:var(--red-bg); transform:scale(1.04); box-shadow:0 0 16px var(--red-glow); }
 
   /* ── FOOTER ── */
   .footer { text-align:center; font-size:11px; letter-spacing:2px; color:var(--text-dim); margin-top:32px; font-family:'Share Tech Mono',monospace; text-transform:uppercase; display:flex; align-items:center; justify-content:center; gap:8px; }
 
   /* ── STAT MODE TOGGLE ── */
-  .stat-mode-row {
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-    margin-top:16px; padding-top:16px;
-    border-top:1px solid var(--border);
-  }
-  .mode-toggle-wrap {
-    display:flex; align-items:center; gap:10px;
-  }
-  .mode-pill {
-    display:flex; align-items:center;
-    background:var(--bg-input); border:2px solid var(--border);
-    border-radius:30px; padding:3px; gap:3px;
-    transition:border-color .2s;
-  }
-  .mode-pill:hover { border-color:var(--red-dim); }
-  .mode-btn {
-    font-family:'Fredoka One',cursive; font-size:12px; letter-spacing:1px;
-    padding:6px 14px; border-radius:22px; border:none; cursor:pointer;
-    background:transparent; color:var(--text-muted);
-    transition:all .2s; text-transform:uppercase; white-space:nowrap;
-  }
-  .mode-btn.active {
-    background:var(--red-dim); color:var(--text);
-    box-shadow:0 0 10px var(--red-glow);
-  }
-  .mode-btn.active.blue-mode {
-    background:var(--blue-dim); color:#fff;
-    box-shadow:0 0 10px var(--blue-glow);
-  }
-  .mode-badge {
-    font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:2px;
-    padding:4px 10px; border-radius:20px; text-transform:uppercase; font-weight:700;
-    transition:all .3s;
-  }
-  .mode-badge.six  { color:var(--red-bright); background:var(--red-bg); border:1px solid var(--red-dim); }
-  .mode-badge.five { color:var(--blue);        background:var(--blue-bg); border:1px solid var(--blue-dim); }
+  .stat-mode-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+  .mode-pill { display:flex; align-items:center; background:var(--bg-input); border:2px solid var(--border); border-radius:30px; padding:3px; gap:3px; }
+  .mode-btn { font-family:'Fredoka One',cursive; font-size:12px; letter-spacing:1px; padding:6px 14px; border-radius:22px; border:none; cursor:pointer; background:transparent; color:var(--text-muted); transition:all .2s; text-transform:uppercase; }
+  .mode-btn.active { background:var(--red-dim); color:var(--text); box-shadow:0 0 10px var(--red-glow); }
+  .mode-btn.active.blue-mode { background:var(--blue-dim); color:#fff; box-shadow:0 0 10px var(--blue-glow); }
+  .mode-badge { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:2px; padding:4px 10px; border-radius:20px; text-transform:uppercase; font-weight:700; border:1px solid var(--border); }
+  .mode-badge.six { color:var(--red-bright); background:var(--red-bg); border-color:var(--red-dim); }
+  .mode-badge.five { color:var(--blue); background:var(--blue-bg); border-color:var(--blue-dim); }
 
-  /* ── DISABLED STAT ROW (Oxygen when 5-stat mode) ── */
-  .stat-row.disabled {
-    opacity:0.28; pointer-events:none;
-    border-color:var(--border) !important;
-    background:var(--bg-card) !important;
-    filter:grayscale(0.6);
-    position:relative;
-  }
-  .stat-row.disabled::after {
-    content:'N/A — No Oxygen Stat';
-    position:absolute; inset:0;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Fredoka One',cursive; font-size:13px; letter-spacing:2px;
-    text-transform:uppercase; color:var(--text-dim);
-    background:rgba(14,14,21,0.55);
-    border-radius:8px;
-    pointer-events:none;
-  }
+  /* ── DISABLED STAT ROW ── */
+  .stat-row.disabled { opacity:0.28; pointer-events:none; filter:grayscale(0.6); position:relative; }
+  .stat-row.disabled::after { content:'N/A — No Oxygen Stat'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Fredoka One',cursive; font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); background:rgba(14,14,21,0.55); border-radius:8px; }
 
-  @media(max-width:680px){
-    .char-svg{width:90px!important;height:auto!important}
-    .main-title{font-size:22px}
-    .stat-row,.grid-header{grid-template-columns:90px 1fr 90px 70px}
-  }
+  @media(max-width:680px){ .char-svg{width:90px!important;height:auto!important} .main-title{font-size:22px} .stat-row,.grid-header{grid-template-columns:90px 1fr 90px 70px} }
   @media(max-width:480px){.char-wrap{display:none}}
 </style>
 </head>
@@ -387,327 +290,165 @@
 
 <div class="app-wrapper">
 
-  <!-- ── HEADER ── -->
   <header class="header">
     <div class="header-inner">
-
-      <!-- PISTOLA -->
       <div class="char-wrap pistola">
         <svg class="char-svg" width="122" height="202" viewBox="0 0 122 202" fill="none">
           <ellipse cx="61" cy="197" rx="30" ry="5" fill="rgba(0,0,0,0.4)"/>
-          <!-- Black joggers with red stripe -->
           <rect x="38" y="132" width="19" height="54" rx="8" fill="#1a1a1a"/>
           <rect x="58" y="132" width="19" height="54" rx="8" fill="#1a1a1a"/>
           <rect x="43" y="134" width="4" height="48" rx="2" fill="#c42020" opacity="0.75"/>
           <rect x="63" y="134" width="4" height="48" rx="2" fill="#c42020" opacity="0.75"/>
           <rect x="38" y="180" width="19" height="7" rx="3" fill="#111"/>
           <rect x="58" y="180" width="19" height="7" rx="3" fill="#111"/>
-          <!-- Black shoes red sole -->
           <ellipse cx="47" cy="192" rx="13" ry="7" fill="#111"/>
           <ellipse cx="67" cy="192" rx="13" ry="7" fill="#111"/>
           <rect x="34" y="192" width="26" height="3" rx="1.5" fill="#c42020"/>
           <rect x="54" y="192" width="26" height="3" rx="1.5" fill="#c42020"/>
-          <!-- Black hoodie -->
           <rect x="29" y="82" width="62" height="56" rx="12" fill="#1c1c1c"/>
           <rect x="29" y="132" width="62" height="4" rx="2" fill="#b01818" opacity="0.9"/>
-          <!-- Pocket -->
           <rect x="41" y="110" width="38" height="22" rx="6" fill="#151515"/>
-          <!-- Skull on pocket -->
           <circle cx="60" cy="117" r="5" fill="#b81818" opacity="0.9"/>
           <circle cx="58" cy="116" r="1.3" fill="#111"/>
           <circle cx="62" cy="116" r="1.3" fill="#111"/>
           <path d="M57,119 Q60,121 63,119" stroke="#111" stroke-width="1.3" fill="none"/>
           <rect x="57" y="122" width="2" height="4" rx="1" fill="#b81818" opacity="0.7"/>
           <rect x="61" y="122" width="2" height="4" rx="1" fill="#b81818" opacity="0.7"/>
-          <!-- Small red chevrons on chest -->
           <path d="M36,93 L40,89 L44,93" stroke="#c42020" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M36,98 L40,94 L44,98" stroke="#c42020" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-          <!-- Arms -->
           <rect x="0"  y="82" width="31" height="14" rx="7" fill="#1c1c1c"/>
           <rect x="90" y="82" width="31" height="14" rx="7" fill="#1c1c1c"/>
-          <rect x="0"   y="85" width="9" height="3" rx="1.5" fill="#c42020" opacity="0.8"/>
-          <rect x="112" y="85" width="9" height="3" rx="1.5" fill="#c42020" opacity="0.8"/>
-          <!-- Hands -->
           <ellipse cx="4"   cy="89" rx="7" ry="5" fill="#e8b898"/>
           <ellipse cx="117" cy="89" rx="7" ry="5" fill="#e8b898"/>
-          <!-- Neck -->
           <rect x="52" y="68" width="17" height="18" rx="7" fill="#e8b898"/>
-          <!-- Black hood -->
           <ellipse cx="61" cy="60" rx="33" ry="31" fill="#1c1c1c"/>
-          <!-- Bear ears black/red -->
           <circle cx="36" cy="35" r="12" fill="#1c1c1c"/>
           <circle cx="86" cy="35" r="12" fill="#1c1c1c"/>
           <circle cx="36" cy="35" r="6"  fill="#8a1515"/>
           <circle cx="86" cy="35" r="6"  fill="#8a1515"/>
-          <!-- Dark hair -->
           <path d="M28,55 C24,38 28,22 61,20 C94,22 98,38 94,55 C94,72 90,85 88,98 L78,112 C78,112 83,80 83,62 C76,65 68,67 61,67 C54,67 46,65 39,62 C39,80 44,112 44,112 L32,98 C30,85 28,72 28,55Z" fill="#1a1218"/>
-          <path d="M36,50 C38,36 46,28 61,28 C76,28 84,36 86,50 C83,44 74,39 61,39 C48,39 39,44 36,50Z" fill="#1a1218"/>
-          <!-- Red highlight streaks -->
-          <path d="M36,50 C37,42 40,36 45,32" stroke="#8a1515" stroke-width="2" opacity="0.55" stroke-linecap="round" fill="none"/>
-          <path d="M84,48 C83,40 80,34 76,30" stroke="#8a1515" stroke-width="1.5" opacity="0.4" stroke-linecap="round" fill="none"/>
-          <!-- Face -->
           <ellipse cx="61" cy="54" rx="23" ry="21" fill="#e8b898"/>
-          <!-- Sharp eyes -->
           <ellipse cx="52" cy="52" rx="5.5" ry="6.5" fill="#1a1218"/>
           <ellipse cx="70" cy="52" rx="5.5" ry="6.5" fill="#1a1218"/>
-          <ellipse cx="54" cy="50" rx="2.2" ry="2.5" fill="white"/>
-          <ellipse cx="72" cy="50" rx="2.2" ry="2.5" fill="white"/>
-          <!-- Sharp eyebrows -->
-          <path d="M47,44 Q53,41 58,44" stroke="#1a1218" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <path d="M64,44 Q69,41 75,44" stroke="#1a1218" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <ellipse cx="46" cy="58" rx="6" ry="3.5" fill="#cc7080" opacity="0.2"/>
-          <ellipse cx="76" cy="58" rx="6" ry="3.5" fill="#cc7080" opacity="0.2"/>
-          <!-- Red lips -->
           <path d="M55,63 Q61,67 67,63" stroke="#b02020" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-          <path d="M58,57 Q61,59 64,57" stroke="#b07860" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          <!-- Red drawstring -->
-          <path d="M55,76 L53,86 M67,76 L69,86" stroke="#c42020" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="53" cy="87" r="3" fill="#8a1515"/>
-          <circle cx="69" cy="87" r="3" fill="#8a1515"/>
         </svg>
         <div class="char-name">Pistola</div>
       </div>
 
-      <!-- TITLE -->
       <div class="title-block">
         <div class="sass-house-label">Sass House</div>
         <div class="main-title">Sassalyzer</div>
         <div class="title-tagline">Dino Breeding · Stat Optimizer</div>
       </div>
 
-      <!-- KEEBS -->
       <div class="char-wrap keebs">
         <svg class="char-svg" width="122" height="202" viewBox="0 0 122 202" fill="none">
           <ellipse cx="61" cy="197" rx="28" ry="5" fill="rgba(0,0,0,0.35)"/>
-          <!-- Blue tights -->
           <rect x="40" y="147" width="17" height="49" rx="7" fill="#2872c4"/>
           <rect x="61" y="147" width="17" height="49" rx="7" fill="#2872c4"/>
           <ellipse cx="48" cy="193" rx="13" ry="6" fill="#2872c4"/>
           <ellipse cx="69" cy="193" rx="13" ry="6" fill="#2872c4"/>
-          <!-- Dress skirt flare -->
           <path d="M27,110 C24,132 21,148 38,150 L43,150 L41,147 L52,150 L61,152 L70,150 L81,147 L79,150 L84,150 C101,148 98,132 95,110Z" fill="#2872c4"/>
-          <!-- Bodice -->
           <rect x="31" y="82" width="58" height="34" rx="10" fill="#3485d8"/>
-          <!-- Giraffes on dress -->
-          <g transform="translate(31,118) scale(0.27)">
-            <ellipse cx="20" cy="42" rx="10" ry="13" fill="#f5c842"/>
-            <rect x="8"  y="44" width="5" height="12" rx="2" fill="#f5c842"/>
-            <rect x="14" y="46" width="5" height="10" rx="2" fill="#f5c842"/>
-            <rect x="20" y="44" width="5" height="12" rx="2" fill="#f5c842"/>
-            <rect x="26" y="46" width="5" height="10" rx="2" fill="#f5c842"/>
-            <rect x="17" y="16" width="6" height="30" rx="3" fill="#f5c842"/>
-            <ellipse cx="20" cy="13" rx="9" ry="8" fill="#f5c842"/>
-            <circle cx="15" cy="5"  r="2.5" fill="#f5c842"/>
-            <circle cx="25" cy="5"  r="2.5" fill="#f5c842"/>
-            <circle cx="13" cy="11" r="4"   fill="#c47a1e" opacity="0.75"/>
-            <circle cx="26" cy="15" r="3"   fill="#c47a1e" opacity="0.75"/>
-            <circle cx="19" cy="7"  r="2.5" fill="#c47a1e" opacity="0.75"/>
-            <circle cx="22" cy="22" r="3"   fill="#c47a1e" opacity="0.75"/>
-            <circle cx="16" cy="12" r="1.5" fill="#2d2d3a"/>
-            <circle cx="24" cy="12" r="1.5" fill="#2d2d3a"/>
-          </g>
-          <g transform="translate(77,121) scale(0.23)">
-            <ellipse cx="20" cy="42" rx="10" ry="12" fill="#f5c842"/>
-            <rect x="8"  y="44" width="5" height="11" rx="2" fill="#f5c842"/>
-            <rect x="26" y="46" width="5" height="9"  rx="2" fill="#f5c842"/>
-            <rect x="17" y="18" width="6" height="28" rx="3" fill="#f5c842"/>
-            <ellipse cx="20" cy="14" rx="8" ry="7"  fill="#f5c842"/>
-            <circle cx="15" cy="6"  r="2.5" fill="#f5c842"/>
-            <circle cx="25" cy="6"  r="2.5" fill="#f5c842"/>
-            <circle cx="14" cy="13" r="3.5" fill="#c47a1e" opacity="0.75"/>
-            <circle cx="25" cy="17" r="3"   fill="#c47a1e" opacity="0.75"/>
-            <circle cx="16" cy="12" r="1.5" fill="#2d2d3a"/>
-            <circle cx="23" cy="12" r="1.5" fill="#2d2d3a"/>
-          </g>
-          <g transform="translate(52,86) scale(0.17)">
-            <ellipse cx="20" cy="40" rx="10" ry="12" fill="#f5c842"/>
-            <rect x="17" y="16" width="6" height="26" rx="3" fill="#f5c842"/>
-            <ellipse cx="20" cy="13" rx="9" ry="7"  fill="#f5c842"/>
-            <circle cx="15" cy="5"  r="2.5" fill="#f5c842"/>
-            <circle cx="25" cy="5"  r="2.5" fill="#f5c842"/>
-            <circle cx="13" cy="10" r="4"   fill="#c47a1e" opacity="0.75"/>
-            <circle cx="26" cy="14" r="3"   fill="#c47a1e" opacity="0.75"/>
-            <circle cx="16" cy="11" r="1.5" fill="#2d2d3a"/>
-            <circle cx="24" cy="11" r="1.5" fill="#2d2d3a"/>
-          </g>
-          <!-- Short sleeves -->
           <rect x="0"  y="82" width="33" height="14" rx="7" fill="#3485d8"/>
           <rect x="88" y="82" width="33" height="14" rx="7" fill="#3485d8"/>
-          <ellipse cx="32" cy="89" rx="8" ry="7" fill="#3485d8"/>
-          <ellipse cx="89" cy="89" rx="8" ry="7" fill="#3485d8"/>
-          <!-- Hands -->
           <ellipse cx="5"   cy="89" rx="7" ry="5" fill="#e8b898"/>
           <ellipse cx="117" cy="89" rx="7" ry="5" fill="#e8b898"/>
-          <!-- Neck -->
           <rect x="53" y="68" width="14" height="18" rx="6" fill="#e8b898"/>
-          <!-- Long blonde hair -->
           <path d="M26,55 C22,33 28,16 61,14 C94,16 100,33 96,55 C96,78 92,104 90,122 L78,133 C78,133 84,100 84,76 C76,80 68,82 61,82 C54,82 46,80 38,76 C38,100 44,133 44,133 L32,122 C30,104 26,78 26,55Z" fill="#f0c040"/>
-          <path d="M38,40 C40,28 50,23 61,22" stroke="#ffe070" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.5"/>
-          <path d="M36,48 C38,36 46,28 61,28 C76,28 84,36 86,48" fill="#f0c040"/>
-          <!-- Head -->
           <ellipse cx="61" cy="52" rx="24" ry="22" fill="#e8b898"/>
-          <ellipse cx="47" cy="57" rx="7" ry="4" fill="#ffb0b8" opacity="0.3"/>
-          <ellipse cx="75" cy="57" rx="7" ry="4" fill="#ffb0b8" opacity="0.3"/>
-          <!-- Eyes -->
           <ellipse cx="51" cy="51" rx="5.5" ry="6"  fill="#2d2d3a"/>
           <ellipse cx="71" cy="51" rx="5.5" ry="6"  fill="#2d2d3a"/>
-          <ellipse cx="53" cy="49" rx="2"   ry="2.5" fill="white"/>
-          <ellipse cx="73" cy="49" rx="2"   ry="2.5" fill="white"/>
-          <ellipse cx="52" cy="52" rx="2"   ry="2"   fill="#3485d8" opacity="0.35"/>
-          <ellipse cx="72" cy="52" rx="2"   ry="2"   fill="#3485d8" opacity="0.35"/>
-          <!-- Eyebrows -->
-          <path d="M45,44 Q51,41 57,44" stroke="#8a6020" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <path d="M65,44 Q71,41 77,44" stroke="#8a6020" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <!-- Smirk -->
           <path d="M56,62 Q62,66 66,62" stroke="#c07868" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-          <path d="M59,57 Q61,59 63,57" stroke="#c07868" stroke-width="1.5" stroke-linecap="round" fill="none"/>
         </svg>
         <div class="char-name">Keebs</div>
       </div>
-
     </div>
   </header>
 
-  <!-- ── CONFIG PANEL ── -->
   <div class="panel red-panel">
     <div class="panel-title"><span class="icon">💀</span> Configuration</div>
     <div class="level-section">
       <div>
         <div class="input-label">Dino Level</div>
         <div class="level-input-wrap">
-          <span class="tip">
-            <input type="number" id="dinoLevel" class="level-input" value="150" min="1" max="9999">
-            <span class="tip-box">Enter the total level of your dino — the number shown on its name tag in ARK.</span>
-          </span>
+          <input type="number" id="dinoLevel" class="level-input" value="150" min="1">
           <div class="level-arrows">
-            <span class="tip" style="display:block">
-              <button class="arrow-btn" onclick="adjustLevel(1)">▲</button>
-              <span class="tip-box">Increase level by 1</span>
-            </span>
-            <span class="tip" style="display:block">
-              <button class="arrow-btn" onclick="adjustLevel(-1)">▼</button>
-              <span class="tip-box">Decrease level by 1</span>
-            </span>
+            <button class="arrow-btn" onclick="adjustLevel(1)">▲</button>
+            <button class="arrow-btn" onclick="adjustLevel(-1)">▼</button>
           </div>
         </div>
       </div>
-
       <div class="avg-display">
         <div class="input-label">Average Target Per Stat</div>
-        <span class="tip" style="display:block">
-          <div class="avg-value-box">
-            <div class="avg-value-label">Calculated Baseline</div>
-            <div class="avg-value-num" id="avgDisplay">25.0</div>
-          </div>
-          <span class="tip-box">The average points per stat if the level were split perfectly. Rounded down. Use this as your benchmark — priority stats (Health, Stamina, Damage) should ideally beat this number.</span>
-        </span>
+        <div class="avg-value-box">
+          <div class="avg-value-label">Calculated Baseline</div>
+          <div class="avg-value-num" id="avgDisplay">25.0</div>
+        </div>
       </div>
     </div>
-
-    <!-- ── STAT COUNT MODE ── -->
     <div class="stat-mode-row">
-      <div class="input-label" style="margin-bottom:0">Stat Count Mode</div>
-      <span class="tip">
-        <div class="mode-pill">
-          <button class="mode-btn active" id="btn6stat" onclick="setStatMode(6)">6 Stats</button>
-          <button class="mode-btn"        id="btn5stat" onclick="setStatMode(5)">5 Stats (No Oxygen)</button>
-        </div>
-        <span class="tip-box">Most land and air dinos have 6 stats including Oxygen (e.g. Rex, Giga, Wyvern, Raptor). Fully aquatic dinos have no Oxygen stat and only 5 stats (e.g. Sarco, Deinosuchus, Megalodon, Plesiosaur). The baseline average adjusts automatically.</span>
-      </span>
+      <div class="input-label">Stat Count Mode</div>
+      <div class="mode-pill">
+        <button class="mode-btn active" id="btn6stat" onclick="setStatMode(6)">6 Stats</button>
+        <button class="mode-btn"        id="btn5stat" onclick="setStatMode(5)">5 Stats</button>
+      </div>
       <span class="mode-badge six" id="modeBadge">÷ 6 stats</span>
     </div>
   </div>
 
-  <!-- ── COMPARATOR PANEL ── -->
   <div class="panel blue-panel">
     <div class="panel-title"><span class="icon">🦕</span> Stat Comparator</div>
-    <div class="legend">
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> ⭐ Star Stat</div><span class="tip-box bl">A huge spike in a priority stat (Health, Stamina or Damage) — this dino is worth keeping regardless of overall spread.</span></span>
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--silver)"></div> Weight Spike</div><span class="tip-box bl">Major Weight spike — valuable for flyers and hauling dinos even if other stats are poor.</span></span>
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Above Avg</div><span class="tip-box bl">More points than the baseline — desirable for breeding.</span></span>
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--grey)"></div> At Average</div><span class="tip-box">Exactly average — neutral allocation.</span></span>
-      <span class="tip"><div class="legend-item"><div class="legend-dot" style="background:var(--red-bright)"></div> Below Avg</div><span class="tip-box">Points wasted here instead of useful stats.</span></span>
-    </div>
     <div class="grid-header">
       <span>Stat</span>
-      <span class="tip" style="display:inline-block">Distribution<span class="tip-box bl">Visual bar showing this stat's points. The glowing red line marks the average target.</span></span>
-      <span class="tip" style="display:inline-block;text-align:center">Points<span class="tip-box bl">Enter the wild/bred stat point count (visible in-game in the dino's stat panel).</span></span>
-      <span class="tip" style="display:inline-block;text-align:center">Variance<span class="tip-box bl">Points above (+) or below (−) the baseline. Green is good, red means wasted allocation.</span></span>
+      <span>Distribution</span>
+      <span style="text-align:center">Points</span>
+      <span style="text-align:center">Variance</span>
     </div>
     <div class="stat-grid" id="statGrid"></div>
   </div>
 
-  <!-- ── SUMMARY ── -->
   <div class="summary-panel">
-    <span class="tip"><div class="summary-stat">
+    <div class="summary-stat">
       <div class="summary-num green" id="sumAbove">0</div>
       <div class="summary-label">Above Avg</div>
-    </div><span class="tip-box">Count of stats that beat the average baseline. Higher = better breeding candidate.</span></span>
+    </div>
     <div class="summary-divider"></div>
-    <span class="tip"><div class="summary-stat">
+    <div class="summary-stat">
       <div class="summary-num warn" id="sumExact">0</div>
       <div class="summary-label">At Average</div>
-    </div><span class="tip-box">Stats that exactly hit the average — neither good nor bad.</span></span>
+    </div>
     <div class="summary-divider"></div>
-    <span class="tip"><div class="summary-stat">
+    <div class="summary-stat">
       <div class="summary-num rc" id="sumBelow">0</div>
       <div class="summary-label">Below Avg</div>
-    </div><span class="tip-box">Count of stats below average. These represent RNG points wasted on dump stats.</span></span>
-    <div class="summary-divider"></div>
-    <span class="tip"><div class="summary-stat">
-      <div class="summary-num rc" id="sumNet" style="color:var(--text-muted)">—</div>
-      <div class="summary-label">Net Points</div>
-    </div><span class="tip-box">Total surplus/deficit across all entered stats vs the average. Positive = this dino's useful stats are above average overall.</span></span>
+    </div>
     <div class="verdict">
-      <span class="tip">
-        <span class="verdict-text neutral" id="verdictText">Awaiting Data</span>
-        <span class="tip-box">⭐ Star Dino = massive spike in Health, Stamina or Damage — breed it regardless of overall spread. ⭐ Weight Star = huge Weight spike, valuable for flyers. ✓ Strong Breed = good overall spread. ~ Marginal = situational. ✕ Cull = nothing worth keeping.</span>
-      </span>
+      <span class="verdict-text neutral" id="verdictText">Awaiting Data</span>
     </div>
   </div>
 
-  <span class="tip" style="display:block;text-align:center">
-    <button class="btn-clear" onclick="clearStats()">↺ Clear All Stats</button>
-    <span class="tip-box">Reset all stat inputs and clear the comparator grid to start fresh.</span>
-  </span>
+  <button class="btn-clear" onclick="clearStats()">↺ Clear All Stats</button>
 
   <div class="footer">
-    <span>🦖</span>
-    Sass House Sassalyzer v1.0 · Breeding Optimization
-    <span>🦕</span>
+    <span>🦖</span> Sass House Sassalyzer v1.1 · Optimized Streaming Style <span>🦕</span>
   </div>
 </div>
 
 <script>
 const STATS = [
-  { key:'health',  name:'Health',  icon:'♥', priority:1,
-    tip:'Total hit points. PRIORITY STAT — a big spike here is worth breeding on even if everything else is poor.' },
-  { key:'stamina', name:'Stamina', icon:'⚡', priority:1,
-    tip:'Energy for sprinting and attacking. PRIORITY STAT — high stamina is critical for combat and travel dinos.' },
-  { key:'oxygen',  name:'Oxygen',  icon:'◎', priority:0,
-    tip:'Underwater breath capacity. Dump stat for most dinos — a spike here is not useful for breeding.' },
-  { key:'food',    name:'Food',    icon:'⬟', priority:0,
-    tip:'Hunger rate. Not a breeding priority — a spike here is wasted RNG.' },
-  { key:'weight',  name:'Weight',  icon:'⊞', priority:2,
-    tip:'Carry capacity. SECONDARY PRIORITY — especially important for flyers (Argent, Wyvern) and hauling dinos. A big spike here is worth noting.' },
-  { key:'damage',  name:'Damage',  icon:'⚔', priority:1,
-    tip:'Melee damage multiplier. PRIORITY STAT — a spike here is extremely valuable for combat lines. Always breed on this.' },
+  { key:'health',  name:'Health',  icon:'♥', priority:1, tip:'Total hit points.' },
+  { key:'stamina', name:'Stamina', icon:'⚡', priority:1, tip:'Energy for sprinting.' },
+  { key:'oxygen',  name:'Oxygen',  icon:'◎', priority:0, tip:'Underwater breath.' },
+  { key:'food',    name:'Food',    icon:'⬟', priority:0, tip:'Hunger rate.' },
+  { key:'weight',  name:'Weight',  icon:'⊞', priority:2, tip:'Carry capacity.' },
+  { key:'damage',  name:'Damage',  icon:'⚔', priority:1, tip:'Melee damage.' },
 ];
-
-// priority: 1 = top tier (Health/Stamina/Damage), 2 = secondary (Weight), 0 = dump stat
 
 let currentAvg = 25.0, maxStatSeen = 1, statMode = 6;
 
-function getStatCount() { return statMode; }
-
 function getAvg() {
   const level = parseInt(document.getElementById('dinoLevel').value) || 150;
-  return Math.floor(level / getStatCount());
-}
-
-// Spike threshold: at least 30% above average, minimum 6 points
-function spikeThreshold() {
-  return Math.max(6, Math.floor(currentAvg * 0.3));
+  return Math.floor(level / statMode);
 }
 
 function setStatMode(n) {
@@ -715,12 +456,9 @@ function setStatMode(n) {
   document.getElementById('btn6stat').className = 'mode-btn' + (n===6 ? ' active' : '');
   document.getElementById('btn5stat').className = 'mode-btn' + (n===5 ? ' active blue-mode' : '');
   const badge = document.getElementById('modeBadge');
-  if (n === 5) { badge.textContent = '÷ 5 stats'; badge.className = 'mode-badge five'; }
-  else         { badge.textContent = '÷ 6 stats'; badge.className = 'mode-badge six'; }
-  const oxyRow   = document.getElementById('row-oxygen');
-  const oxyInput = document.getElementById('input-oxygen');
-  if (n === 5) { oxyRow.classList.add('disabled'); oxyInput.value = ''; }
-  else         { oxyRow.classList.remove('disabled'); }
+  badge.textContent = `÷ ${n} stats`;
+  badge.className = 'mode-badge ' + (n===5 ? 'five' : 'six');
+  document.getElementById('row-oxygen').classList.toggle('disabled', n===5);
   updateAvg();
 }
 
@@ -730,209 +468,95 @@ function buildGrid() {
   STATS.forEach(s => {
     const row = document.createElement('div');
     row.className = 'stat-row'; row.id = `row-${s.key}`;
-    // Priority badge label
-    let badge = '';
-    if (s.priority === 1) badge = `<span class="priority-badge p1" title="Top priority stat">★ Priority</span>`;
-    if (s.priority === 2) badge = `<span class="priority-badge p2" title="Secondary priority stat">★ Notable</span>`;
+    let bClass = s.priority === 1 ? 'p1' : (s.priority === 2 ? 'p2' : '');
+    let bText = s.priority === 1 ? '★ Priority' : (s.priority === 2 ? '★ Notable' : '');
     row.innerHTML = `
-      <div class="stat-name">
-        <span class="stat-icon">${s.icon}</span>${s.name}${badge}
-      </div>
-      <div class="stat-bar-wrap" id="barwrap-${s.key}">
-        <div class="stat-bar-fill"    id="bar-${s.key}"      style="width:0%"></div>
+      <div class="stat-name"><span class="stat-icon">${s.icon}</span>${s.name}${bClass?`<span class="priority-badge ${bClass}">${bText}</span>`:''}</div>
+      <div class="stat-bar-wrap">
+        <div class="stat-bar-fill" id="bar-${s.key}" style="width:0%"></div>
         <div class="stat-bar-avg-marker" id="avgmark-${s.key}"></div>
-        <div class="spike-marker"    id="spikemark-${s.key}"></div>
       </div>
-      <span class="tip bl" style="display:block">
-        <input type="number" class="stat-input" id="input-${s.key}" placeholder="—" min="0" max="999" oninput="recalcAll()">
-        <span class="tip-box">${s.tip}</span>
-      </span>
-      <span class="tip bl" style="display:block;text-align:right">
-        <div class="variance-badge" id="var-${s.key}">—</div>
-        <span class="tip-box">Points above (+) or below (−) the average baseline for this stat.</span>
-      </span>`;
+      <input type="number" class="stat-input" id="input-${s.key}" placeholder="—" oninput="recalcAll()">
+      <div class="variance-badge" id="var-${s.key}">—</div>`;
     grid.appendChild(row);
   });
 }
 
 function updateAvg() {
   currentAvg = getAvg();
-  const el = document.getElementById('avgDisplay');
-  el.textContent = currentAvg.toFixed(0);
-  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+  document.getElementById('avgDisplay').textContent = currentAvg;
   recalcAll();
 }
 
 function recalcAll() {
   let above=0, exact=0, below=0, netSum=0, anyFilled=false, maxVal=1;
-  let hasPrimarySpike = false;   // Health, Stamina, or Damage spike
-  let hasWeightSpike  = false;   // Weight spike
-  const threshold = spikeThreshold();
-  const activeStats = STATS.filter(s => !(statMode === 5 && s.key === 'oxygen'));
-
-  activeStats.forEach(s => {
-    const v = parseFloat(document.getElementById(`input-${s.key}`).value);
+  STATS.forEach(s => {
+    const inp = document.getElementById(`input-${s.key}`);
+    const v = parseFloat(inp.value);
     if (!isNaN(v)) maxVal = Math.max(maxVal, v);
   });
-  maxStatSeen = Math.max(maxVal, currentAvg * 1.6);
+  maxStatSeen = Math.max(maxVal, currentAvg * 1.5);
 
   STATS.forEach(s => {
-    const isDisabled = statMode === 5 && s.key === 'oxygen';
-    const input    = document.getElementById(`input-${s.key}`);
-    const row      = document.getElementById(`row-${s.key}`);
-    const vb       = document.getElementById(`var-${s.key}`);
-    const bar      = document.getElementById(`bar-${s.key}`);
-    const mk       = document.getElementById(`avgmark-${s.key}`);
-    const spikeMk  = document.getElementById(`spikemark-${s.key}`);
-
-    if (isDisabled) { bar.style.width='0%'; vb.textContent='—'; return; }
-
-    mk.style.left = Math.min((currentAvg / maxStatSeen)*100, 100) + '%';
-
+    const input = document.getElementById(`input-${s.key}`);
+    const row = document.getElementById(`row-${s.key}`);
+    const vb = document.getElementById(`var-${s.key}`);
+    const bar = document.getElementById(`bar-${s.key}`);
+    const mk = document.getElementById(`avgmark-${s.key}`);
+    
+    if (statMode === 5 && s.key === 'oxygen') { bar.style.width='0%'; return; }
+    mk.style.left = (currentAvg / maxStatSeen * 100) + '%';
+    
     const val = parseFloat(input.value);
-    if (isNaN(val) || input.value === '') {
-      row.className='stat-row'; vb.textContent='—'; bar.style.width='0%';
-      if(spikeMk) spikeMk.style.opacity='0';
-      return;
-    }
-
+    if (isNaN(val)) { row.className='stat-row'; vb.textContent='—'; bar.style.width='0%'; return; }
     anyFilled = true;
-    const v = val - currentAvg;
-    netSum += v;
-    bar.style.width = Math.min((val / maxStatSeen)*100, 100) + '%';
-
-    // Detect spike
-    const isSpike = v >= threshold;
-    if (isSpike && s.priority === 1) hasPrimarySpike = true;
-    if (isSpike && s.priority === 2) hasWeightSpike  = true;
-
-    // Place the golden spike marker at the stat's bar position
-    if (spikeMk) {
-      spikeMk.style.left = Math.min((val / maxStatSeen)*100, 100) + '%';
-    }
-
-    // Assign row class — spikes override above/below colouring
-    if (isSpike && s.priority === 1) {
-      row.className = 'stat-row spike-primary';
-      vb.textContent = `+${v.toFixed(1)}`;
-      above++;
-    } else if (isSpike && s.priority === 2) {
-      row.className = 'stat-row spike-secondary';
-      vb.textContent = `+${v.toFixed(1)}`;
-      above++;
-    } else if (v > 0.05) {
-      row.className = 'stat-row above'; vb.textContent=`+${v.toFixed(1)}`; above++;
-    } else if (v < -0.05) {
-      row.className = 'stat-row below'; vb.textContent=v.toFixed(1); below++;
-    } else {
-      row.className = 'stat-row exact'; vb.textContent='±0.0'; exact++;
-    }
+    const diff = val - currentAvg;
+    netSum += diff;
+    bar.style.width = (val / maxStatSeen * 100) + '%';
+    
+    if (diff > 0.1) { row.className='stat-row above'; vb.textContent=`+${diff}`; above++; }
+    else if (diff < -0.1) { row.className='stat-row below'; vb.textContent=diff; below++; }
+    else { row.className='stat-row exact'; vb.textContent='±0'; exact++; }
   });
 
   document.getElementById('sumAbove').textContent = above;
   document.getElementById('sumExact').textContent = exact;
   document.getElementById('sumBelow').textContent = below;
-
-  const ne = document.getElementById('sumNet');
   const vd = document.getElementById('verdictText');
-
   if (anyFilled) {
-    ne.textContent = (netSum>=0?'+':'') + netSum.toFixed(1);
-    ne.style.color = netSum>0 ? 'var(--green)' : netSum<0 ? 'var(--red-bright)' : 'var(--warn)';
-
-    if (hasPrimarySpike) {
-      // Top verdict — spike in Health, Stamina or Damage
-      vd.textContent = '⭐ Star Dino!';
-      vd.className   = 'verdict-text star';
-    } else if (hasWeightSpike) {
-      // Secondary verdict — Weight spike only
-      vd.textContent = '⭐ Weight Star';
-      vd.className   = 'verdict-text weight-star';
-    } else if (above > below + 1) {
-      vd.textContent = '✓ Strong Breed!';
-      vd.className   = 'verdict-text good';
-    } else if (below > above + 1) {
-      vd.textContent = '✕ Cull It';
-      vd.className   = 'verdict-text bad';
-    } else {
-      vd.textContent = '~ Marginal';
-      vd.className   = 'verdict-text neutral';
-    }
+    vd.textContent = netSum > 0 ? '✓ Strong Breed' : (netSum < 0 ? '✕ Cull It' : '~ Marginal');
+    vd.className = 'verdict-text ' + (netSum > 0 ? 'good' : (netSum < 0 ? 'bad' : 'neutral'));
   } else {
-    ne.textContent='—'; ne.style.color='var(--text-muted)';
-    vd.textContent='Awaiting Data'; vd.className='verdict-text neutral';
+    vd.textContent = 'Awaiting Data'; vd.className = 'verdict-text neutral';
   }
 }
 
 function adjustLevel(d) {
   const inp = document.getElementById('dinoLevel');
-  inp.value = Math.max(1, (parseInt(inp.value)||150) + d); updateAvg();
+  inp.value = Math.max(1, (parseInt(inp.value)||150) + d);
+  updateAvg();
 }
 
 function clearStats() {
-  STATS.forEach(s => {
-    if (statMode === 5 && s.key === 'oxygen') return;
-    document.getElementById(`input-${s.key}`).value = '';
-    document.getElementById(`row-${s.key}`).className = 'stat-row';
-    document.getElementById(`var-${s.key}`).textContent = '—';
-    document.getElementById(`bar-${s.key}`).style.width = '0%';
-  }); recalcAll();
+  STATS.forEach(s => document.getElementById(`input-${s.key}`).value = '');
+  recalcAll();
 }
 
 document.getElementById('dinoLevel').addEventListener('input', updateAvg);
 buildGrid(); updateAvg();
 
-/* ── DINO BACKGROUND ── */
-const DINOS = [
-  // T-Rex (menacing, big head, tiny arms)
-  { vw:100, vh:65, col:'#c42020', p:`M8,52 C8,42 12,36 22,34 L20,20 C18,10 24,4 29,8 C33,12 31,22 30,28 L42,22 C48,20 52,27 49,33 L44,35 C52,32 62,36 74,44 C84,50 90,58 86,61 L78,61 C76,66 70,68 66,65 L64,60 L44,60 C42,66 36,68 32,65 L30,60 L18,57 C12,55 8,52 8,52Z M24,20 C22,13 27,8 31,12Z` },
-  // Stegosaurus (plates on back)
-  { vw:120, vh:68, col:'#1a6e30', p:`M10,52 C10,42 20,38 35,38 L34,18 C35,8 41,6 43,13 L43,20 L49,12 C50,4 55,3 57,10 L57,20 L63,11 C64,3 69,3 70,10 L70,20 L76,14 C77,6 82,7 82,14 L82,22 C90,22 105,30 110,40 L110,52 C110,60 104,63 100,60 L98,52 L74,52 L72,60 C68,64 62,62 61,58 L60,52 L34,52 L32,60 C28,64 22,62 21,58 L20,52 C14,50 10,52 10,52Z` },
-  // Triceratops (horns, frill)
-  { vw:110, vh:58, col:'#1a4a8e', p:`M4,40 C4,30 10,24 18,22 L12,16 C10,8 17,4 21,10 L26,20 C29,12 36,9 39,15 L38,22 C42,13 52,11 53,18 L49,24 C62,22 80,28 96,36 C106,41 109,50 104,53 L96,53 C94,59 88,61 84,58 L82,52 L50,52 L48,58 C44,62 38,60 37,56 L36,52 L20,50 C11,47 4,44 4,40Z` },
-  // Raptor (lean, quick)
-  { vw:90, vh:60, col:'#b06010', p:`M5,50 C5,40 9,34 18,32 L16,18 C16,9 22,5 27,9 C31,13 29,22 28,28 L40,24 C46,21 50,27 47,33 C58,30 72,34 82,42 C90,48 92,56 86,58 L78,58 C76,62 70,64 67,61 L66,56 L44,56 L42,60 C38,64 32,62 31,58 L30,54 L17,51 C10,49 5,50 5,50Z M16,18 C14,11 19,7 23,11Z` },
-  // Parasaur (duckbill, crest)
-  { vw:110, vh:58, col:'#7a3a8e', p:`M5,48 C5,38 12,32 22,30 L16,20 C15,11 22,7 27,13 L30,25 C34,17 43,13 46,20 L44,28 C56,26 76,32 92,40 C103,45 108,53 102,56 L94,56 C92,62 86,64 82,61 L80,55 L50,55 L48,61 C44,65 38,63 37,59 L36,55 L21,52 C11,49 5,48 5,48Z M28,24 C24,17 28,10 34,13 C39,16 38,22 36,25Z` },
-  // Brontosaurus (long neck)
-  { vw:130, vh:72, col:'#2a6a4a', p:`M8,58 C8,48 14,42 24,40 L22,24 C20,12 27,6 33,10 C37,14 36,26 34,32 L44,26 C52,22 57,28 54,36 L50,40 C66,36 90,40 112,50 C122,55 128,64 122,67 L114,67 C112,72 106,74 102,71 L100,65 L68,65 L66,71 C62,75 56,73 55,69 L54,65 L30,62 C17,59 8,58 8,58Z` },
-  // Ankylosaurus (club tail, armoured)
-  { vw:108, vh:48, col:'#7a5010', p:`M5,35 C5,25 12,20 22,18 C28,12 38,10 48,12 C58,8 68,8 76,12 C86,14 98,21 103,30 C108,37 105,46 98,48 L90,46 L88,38 L62,38 L60,46 L40,46 L38,38 L18,38 L16,44 C12,48 7,47 6,43 L5,35Z M22,20 L25,11 M38,14 L40,6 M53,12 L55,4 M68,12 L70,4 M82,17 L85,9` },
-  // Pteranodon (flying)
-  { vw:120, vh:50, col:'#8a1080', p:`M2,30 C10,20 25,15 40,20 L55,8 C60,2 68,2 70,8 L70,20 C80,18 95,20 108,28 C115,32 118,40 115,44 C110,38 100,34 90,34 L75,42 C72,48 65,50 62,46 L60,34 L58,46 C55,50 48,48 45,42 L30,38 C20,36 8,38 4,44 C1,40 0,34 2,30Z M60,8 L65,2 C68,-1 74,0 72,6Z` },
-];
-
+/* ── DINO BG ── */
 function spawnDinos() {
   const bg = document.getElementById('dino-bg');
-  const N = 32;
-  for (let i = 0; i < N; i++) {
-    const d = DINOS[Math.floor(Math.random() * DINOS.length)];
-    const scale = 0.35 + Math.random() * 0.75;
-    const left  = Math.random() * 95;
-    const top   = 5 + Math.random() * 88;
-    const dur   = 16 + Math.random() * 24;
-    const delay = -(Math.random() * dur);
-    const op    = 0.035 + Math.random() * 0.065;
-    const rot   = (Math.random() - 0.5) * 12;
-    const flip  = Math.random() > 0.5;
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.setAttribute('viewBox',`0 0 ${d.vw} ${d.vh}`);
-    svg.style.cssText = `width:${d.vw*scale}px;height:${d.vh*scale}px;position:absolute;left:${left}%;top:${top}%;`;
-    svg.style.setProperty('--op', op);
-    svg.style.setProperty('--rot', rot+'deg');
-    svg.style.animationDuration = dur+'s';
-    svg.style.animationDelay    = delay+'s';
-    svg.classList.add('bg-dino');
-
-    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    if (flip) { g.setAttribute('transform',`translate(${d.vw},0) scale(-1,1)`); }
-
-    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d', d.p);
-    path.setAttribute('fill', d.col);
-
-    g.appendChild(path); svg.appendChild(g); bg.appendChild(svg);
+  for (let i = 0; i < 20; i++) {
+    const d = document.createElement('div');
+    d.className = 'bg-dino';
+    d.style.left = Math.random() * 90 + '%';
+    d.style.top = Math.random() * 90 + '%';
+    d.style.fontSize = (15 + Math.random() * 20) + 'px';
+    d.textContent = Math.random() > 0.5 ? '🦖' : '🦕';
+    d.style.opacity = 0.05 + Math.random() * 0.1;
+    bg.appendChild(d);
   }
 }
 spawnDinos();
