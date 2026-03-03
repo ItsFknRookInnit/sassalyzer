@@ -2,9 +2,9 @@
 
 > *Dino Breeding · Stat Optimizer · Built by Sass House*
 
-A lightweight, browser-based tool for **ARK: Survival Evolved** players who take their breeding lines seriously. The Sassalyzer calculates the mathematically ideal stat baseline for any tamed or hatched dinosaur, identifies high-value stat spikes in priority stats, and instantly tells you whether a creature is worth breeding on — so you can make smarter decisions without doing the maths in your head.
+A lightweight, browser-based tool for **ARK: Survival Evolved** players who take their breeding lines seriously. The Sassalyzer calculates the mathematically ideal stat baseline for any tamed or hatched dinosaur, detects high-value stat spikes in priority stats, and instantly tells you whether a creature is worth keeping — so you can make smarter decisions without doing the maths in your head.
 
-No downloads. No backend. Open the page, enter your numbers, get your answer.
+No server. No backend. No dependencies. Open the file, enter your numbers, get your answer.
 
 ---
 
@@ -24,134 +24,226 @@ The goal is to stop you from culling creatures that have genuine breeding value 
 ## ✨ Features
 
 - 🔢 **Instant baseline calculator** — enter any dino level and get the average target stat immediately (rounded down)
-- ⭐ **Priority spike detection** — automatically flags massive Health, Stamina or Damage spikes as Star Dinos
-- 🥈 **Weight spike detection** — separately flags significant Weight spikes, useful for flyers and hauling dinos
-- 🏷️ **Priority stat labels** — Health, Stamina and Damage are marked as Priority stats; Weight as Notable, so you always know which stats matter
+- ⭐ **Priority spike detection** — flags massive Health, Stamina or Damage spikes as Star Dinos
+- 🥈 **Weight spike detection** — separately flags major Weight spikes for flyers and haulers
+- 🏷️ **Priority stat labels** — Health, Stamina and Damage marked as Priority; Weight as Notable
 - 🔀 **5-stat / 6-stat mode** — switch for fully aquatic dinos that don't have an Oxygen stat
-- 🖼️ **Immersive Background** — custom gaming room background featuring the Sass House crew
-- 🧊 **Glassmorphism UI** — semi-transparent "glass" panels allow the background to bleed through for a modern aesthetic
-- 📊 **Visual stat bars** — each stat renders as a bar with a marker showing exactly where the average falls
+- 📊 **Visual stat bars** — each stat rendered as a bar with a red marker at the average baseline
 - 🟡🟢🔴 **Colour-coded rows** — gold for spike, green for above average, red for below, grey for exact
-- ➕➖ **Variance display** — shows exactly how many points above or below average each stat is
-- 💬 **Tooltips on everything** — hover over any element for a plain-English explanation
-- 🦕 **Floating dino background** — because why not
-- 📱 **Responsive** — works on desktop and mobile browsers
+- ➕➖ **Variance display** — exact points above or below average per stat
+- 🎨 **Dual character themes** — toggle between Pistola mode (red neon) and Keebs mode (teal neon), each with its own full-screen character artwork backdrop
+- 💬 **Tooltips on everything** — hover any element for a plain-English explanation
+- 📱 **Responsive** — works on desktop and mobile
+
+---
+
+## 🎨 Themes
+
+The toggle at the top of the page switches between two full character themes. The entire colour scheme — accents, glass panels, borders, glows — adapts to match each character's artwork.
+
+### 🤍 Pistola Mode (default)
+Dark gaming room with red neon lighting. Red accent colours, deep red glass panels, red glow effects. Pistola is the character in the grey hoodie with red hearts.
+
+### 💙 Keebs Mode
+Same gaming room with teal/cyan neon lighting. Teal accent colours, dark teal glass panels, cyan glow effects. Keebs is the character in the blue hoodie.
+
+Both themes use the same frosted glass panel aesthetic layered over the full-screen character artwork. Switching themes is instant and preserves all entered data.
 
 ---
 
 ## 🦎 The Characters
 
-| Character | Colours | Vibe |
-|-----------|---------|------|
-| **Pistola** | Black & Red | Dark hoodie, red racing stripes, bear ears, red-sole kicks. The aggressive breeder. |
-| **Keebs** | Light Navy | Light navy hoodie, blonde hair. The methodical analyst. Loves giraffes. |
+| Character | Theme | Look | Vibe |
+|-----------|-------|------|------|
+| **Pistola** | 🔴 Red neon | Grey hoodie with red hearts, bear ears | The aggressive breeder |
+| **Keebs** | 🔵 Teal neon | Blue hoodie, blonde hair | The methodical analyst. Loves giraffes. |
 
 ---
 
 ## 🚀 How To Use
 
-### Step 1 — Enter the Dino's Level
-Type the creature's **total level** into the level field at the top. This is the number shown on the creature's name tag in-game (e.g. `Rex - Lvl 150`).
+### Step 1 — Pick Your Theme
+Use the **🤍 Pistola / 💙 Keebs** toggle at the top to set your preferred colour mode. This is purely cosmetic — all functionality is identical.
 
-Use the **▲ / ▼ buttons** to nudge the level up or down by 1.
+### Step 2 — Enter the Dino's Level
+Type the creature's **total level** into the level field. This is the number shown on the dino's name tag in-game (e.g. `Rex - Lvl 150`). Use the **▲ / ▼ buttons** to nudge by 1.
 
-The **Average Target Per Stat** updates instantly. This is calculated as `Level ÷ stat count`, rounded down — the number of points each stat would have if RNG were perfectly even.
+The **Average Target Per Stat** updates instantly — calculated as `floor(Level ÷ stat count)`.
 
-### Step 2 — Select Stat Count Mode
-At the bottom of the configuration panel is a **Stat Count Mode** pill selector:
+### Step 3 — Select Stat Count Mode
 
 | Mode | When To Use |
 |------|-------------|
-| **6 Stats** (default) | Most land, air, and amphibious dinos that **have** an Oxygen stat — e.g. Rex, Giga, Therizinosaur, Carno, Wyvern, Raptor, Spino, Baryonyx |
-| **5 Stats (No Oxygen)** | Fully aquatic dinos that **do not have** an Oxygen stat — e.g. Sarco, Deinosuchus, Megalodon, Plesiosaur, Manta, Ichthy |
+| **6 Stats** (default) | Land, air, and amphibious dinos with an Oxygen stat — Rex, Giga, Wyvern, Spino, Raptor, etc. |
+| **5 Stats (No Oxygen)** | Fully aquatic dinos without Oxygen — Sarco, Deinosuchus, Megalodon, Plesiosaur, etc. |
 
-When you switch to **5 Stats**:
-- The baseline recalculates using `Level ÷ 5` (average goes up since fewer stats share the pool)
-- The **Oxygen row** is greyed out with an N/A overlay and excluded from all calculations
+The Oxygen row disables with an N/A overlay in 5-stat mode. The baseline recalculates automatically.
 
-> 💡 **Not sure which mode?** Check the dino's stat panel in-game. If Oxygen is listed, use 6 Stats. If it isn't there at all, use 5 Stats.
+### Step 4 — Enter the Stat Points
+Type the **base stat point values** from the dino's stat panel into each input field. These are the raw allocated point counts, not the final multiplied values shown in-game.
 
-### Step 3 — Enter the Stat Points
-In the **Stat Comparator** grid, type the **wild/bred stat point values** into the input fields for each active stat.
+> 💡 Mods like Dino Storage or S+ make it easier to view raw stat points.
 
-> ⚠️ These are the **base stat point counts**, not the final multiplied values shown in-game. You can find them by checking the creature's detailed stat breakdown. Mods like Dino Storage or S+ make this easier to view.
+The stats and their priority levels:
 
-The stats tracked, and their priority levels:
+| Stat | Priority | Notes |
+|------|----------|-------|
+| ❤️ **Health** | ⭐ Top Priority | A spike here is always worth breeding on |
+| ⚡ **Stamina** | ⭐ Top Priority | Critical for combat and travel |
+| ◎ **Oxygen** | — Dump Stat | Not present on aquatic dinos; a spike here has no breeding value |
+| ⬟ **Food** | — Dump Stat | Never a breeding priority |
+| ⊞ **Weight** | 🥈 Notable | Especially valuable for flyers and haulers |
+| ⚔️ **Damage** | ⭐ Top Priority | A spike here is always worth breeding on |
 
-| Stat | Priority | Why It Matters |
-|------|----------|----------------|
-| ❤️ **Health** | ⭐ Top Priority | Total hit points. A spike here is always worth breeding on |
-| ⚡ **Stamina** | ⭐ Top Priority | Energy for combat and travel. A spike is highly valuable |
-| ◎ **Oxygen** | — Dump Stat | Breath capacity. Spikes here are worthless for breeding |
-| ⬟ **Food** | — Dump Stat | Hunger rate. Not a breeding priority at all |
-| ⊞ **Weight** | 🥈 Notable | Carry capacity. Especially valuable for flyers and hauling dinos |
-| ⚔️ **Damage** | ⭐ Top Priority | Melee multiplier. A spike here is always worth breeding on |
+### Step 5 — Read the Verdict
+
+| Verdict | Meaning |
+|---------|---------|
+| ⭐ **Star Dino!** (gold, pulsing) | Major spike in Health, Stamina or Damage — **keep this regardless of overall spread** |
+| ⭐ **Weight Star** (silver) | Major Weight spike — valuable for flyers even if other stats are poor |
+| ✓ **Strong Breed** (green) | Good overall spread above average |
+| **~ Marginal** (grey) | Average across the board — situational |
+| ✕ **Cull It** (red) | Mostly below average with no redeeming spike |
+
+> A Star Dino with terrible overall stats is still more valuable than a Strong Breed with no spike. The spike is what you breed into your lines.
+
+### Step 6 — Reset
+Click **↺ Clear All Stats** to wipe all inputs and start fresh for a new creature.
 
 ---
 
 ## 🧮 The Maths
 
-**Baseline average (6-stat dinos):**
-
+**Baseline average:**
+```
+Average = floor(Level ÷ N)     where N = 6 (default) or 5 (no Oxygen mode)
 ```
 
-Average Stat = floor(Level ÷ 6)
+**Spike threshold (scales with level):**
+```
+Spike = stat variance >= max(6, floor(Average × 0.3))
 
+Level 150, avg = 25:  threshold = max(6, 7)  = +7 above average
+Level 300, avg = 50:  threshold = max(6, 15) = +15 above average
 ```
 
-**Baseline average (5-stat dinos, no Oxygen):**
+**Example — Level 150 Rex (6-stat):**
+```
+floor(150 ÷ 6) = 25 per stat   |   Spike threshold = +7
 
+Health:  38  →  +13  ⭐ SPIKE — priority stat   → ⭐ Star Dino!
+Stamina: 16  →   -9  ❌ below average
+Oxygen:  12  →  -13  ❌ below average (dump stat)
+Food:    18  →   -7  ❌ below average (dump stat)
+Weight:  24  →   -1  ≈ average
+Damage:  42  →  +17  ⭐ SPIKE — priority stat
+
+Verdict: ⭐ Star Dino! (two priority spikes — exceptional breeding candidate)
 ```
 
-Average Stat = floor(Level ÷ 5)
+**Example — Level 150 Sarco (5-stat, no Oxygen):**
+```
+floor(150 ÷ 5) = 30 per stat   |   Spike threshold = +9
 
+Health:  32  →  +2   ✅ above average, not a spike
+Stamina: 20  → -10   ❌ below average
+Oxygen:  N/A →  disabled
+Food:    22  →  -8   ❌ below average
+Weight:  50  → +20   ⭐ SPIKE — secondary stat
+
+Verdict: ⭐ Weight Star (no primary spike, but huge Weight)
 ```
 
-**Spike threshold:**
+---
+
+## 🐊 Common 5-Stat Dinos (No Oxygen)
+
+`Sarco` · `Deinosuchus` · `Megalodon` · `Plesiosaur` · `Mosasaurus` · `Manta` · `Ichthyosaurus` · `Electrophorus` · `Tusoteuthis` · `Cnidaria`
+
+## 🦖 Common 6-Stat Dinos (Have Oxygen)
+
+`Rex` · `Giganotosaurus` · `Therizinosaur` · `Carnotaurus` · `Allosaurus` · `Yutyrannus` · `Spinosaur` · `Baryonyx` · `Raptor` · `Wyvern` · `Rock Drake` · `Managarmr` · `Snow Owl` · `Shadowmane` · `Deinonychus` · `Megalosaurus` · `Argentavis` · `Ankylosaurus`
+
+> 💡 When in doubt — if Oxygen appears in the dino's stat screen in-game, use 6-stat mode.
+
+---
+
+## 🛠️ Technical Details
+
+- **Single file** (`index.html`) — the entire app: HTML, CSS, JavaScript, and both background images are all embedded. No external dependencies, no folders, no paths to break
+- Both background images embedded as base64 data URIs directly in the CSS — works offline, locally, and on any static host
+- Dual theme system via CSS custom properties — switching themes changes a single body class (`pistola` / `keebs`), all colours update instantly via variable inheritance with zero JavaScript style manipulation
+- Frosted glass panel effect via `backdrop-filter: blur()` layered over the full-screen background artwork
+- Spike threshold scales dynamically with level — no hardcoded values
+- Priority system per stat: `1` = top priority (Health/Stamina/Damage), `2` = secondary (Weight), `0` = dump stat
+- Fonts loaded from Google Fonts (Fredoka One, Nunito, Share Tech Mono)
+
+---
+
+## 🌐 Deployment
+
+Single file — works anywhere:
+
+- **GitHub Pages** — upload `index.html` to repo root, enable Pages under Settings → Pages
+- **Vercel** — connect GitHub repo, auto-deploys on every push
+- **Netlify Drop** — drag the single file to netlify.com/drop
+- **Locally** — just open `index.html` in any browser, no server needed
+
+---
+
+## 📁 Project Structure
 
 ```
-
-Spike = stat is at least 30% above average, and at least 6 points above average
-= variance >= max(6, floor(average × 0.3))
-
+sassalyzer/
+└── index.html    ← the entire app lives here (HTML + CSS + JS + images, all inline)
 ```
+
+---
+
+## 🔮 Potential Future Features
+
+- Save/load dino profiles between sessions
+- Multi-dino comparison view
+- Dino name dropdown that auto-sets stat mode and highlights relevant priority stats
+- Adjustable spike threshold sensitivity (strict / standard / relaxed)
+- Export result to image / shareable link
 
 ---
 
 ## 📋 Changelog
 
 ### v1.3
-- **Integrated Custom Streaming Room Background** — Added a high-detail gaming setup background featuring Pistola and Keebs in their natural habitat.
-- **Glassmorphism UI System** — Updated all panels and cards to use semi-transparent backgrounds (`rgba`), allowing the environment to show through while maintaining clarity.
-- **Contrast & Readability Enhancements** — Added a global dark overlay to ensure the UI remains the primary focus and stats are easy to read against the detailed background.
-- **Visual Refresh** — Updated Keebs' character palette to a light navy blue to match the new streaming aesthetic.
+- **Dual character themes** — new Pistola / Keebs toggle at the top of the page
+- Pistola mode: red neon colour scheme, dark red glass panels, full-screen Pistola character artwork as backdrop
+- Keebs mode: teal/cyan neon colour scheme, dark teal glass panels, full-screen Keebs character artwork as backdrop
+- Theme toggle is instant and preserves all entered data
+- All colours exclusively use CSS custom properties — full theme switching by changing one body class, zero JavaScript style manipulation
+- **Back to single file** — reverted from multi-file structure to a single self-contained `index.html`; both background images embedded as base64 data URIs
+- Frosted glass panel aesthetic applied consistently across both themes
 
 ### v1.2
-- Added **priority spike detection system** — Health, Stamina and Damage are tracked as top priority stats; a significant spike in any of them overrides the overall verdict.
-- Added **Weight spike detection** — flagged separately as a secondary priority, particularly useful for flyers and hauling dinos.
-- New **⭐ Star Dino!** verdict (gold, pulsing glow) — fires when any top priority stat has a major spike, regardless of overall stat spread.
-- New **⭐ Weight Star** verdict (silver) — fires when Weight has a major spike and no primary spike is present.
-- Spike threshold scales dynamically with level: `max(6, floor(average × 0.3))` — so the bar rises appropriately as dino level increases.
-- Priority and Notable **stat badges** added to Health, Stamina, Damage and Weight rows so users always know which stats matter.
-- Gold and silver row highlight styles added for spike rows.
-- Removed the **"Use (Level − 1) ÷ 6"** offset toggle — simplified to a clean floor division that covers the vast majority of use cases without confusion.
-- Average stat display now shows a rounded-down integer instead of a decimal.
+- Added **priority spike detection** — Health, Stamina and Damage tracked as top priority; a significant spike overrides the overall verdict
+- Added **Weight spike detection** — flagged separately as ⭐ Weight Star
+- **⭐ Star Dino!** verdict — pulsing gold glow
+- **⭐ Weight Star** verdict — silver
+- Spike threshold scales dynamically: `max(6, floor(average × 0.3))`
+- Priority and Notable stat badges added to Health, Stamina, Damage and Weight rows
+- Removed offset toggle — simplified to floor division
+- Average display shows rounded-down integer
 
 ### v1.1
-- Added **5-stat mode** for fully aquatic dinos that do not have an Oxygen stat (e.g. Sarco, Deinosuchus, Megalodon).
-- Stat count mode pill selector added to the configuration panel.
-- Oxygen row disables with an N/A overlay when 5-stat mode is active.
-- Baseline calculation dynamically switches between `÷ 6` (default) and `÷ 5`.
-- Clear All Stats respects the active mode and skips disabled rows.
-- Tooltips updated throughout to reflect stat count context.
+- Added **5-stat mode** for aquatic dinos without Oxygen (Sarco, Deinosuchus, Megalodon, etc.)
+- Stat count mode pill selector in the configuration panel
+- Oxygen row disables with N/A overlay in 5-stat mode
+- Baseline dynamically switches between `÷ 6` and `÷ 5`
 
 ### v1.0
-- Initial release.
-- 6-stat comparator with real-time variance and colour coding.
-- Breeding verdict system (Strong Breed / Marginal / Cull).
-- Floating dino background.
-- Full tooltip system.
-- Pistola & Keebs character branding.
+- Initial release
+- 6-stat comparator with real-time variance and colour coding
+- Breeding verdict system (Strong Breed / Marginal / Cull)
+- Floating dino background
+- Full tooltip system
+- Pistola & Keebs SVG character branding
 
 ---
 
