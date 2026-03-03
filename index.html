@@ -300,9 +300,7 @@ body::before {
   box-shadow: 0 0 12px var(--accent-glow);
 }
 .mode-badge {
-  font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 2px;
-  padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: 700;
-  border: 1px solid var(--accent-dim); color: var(--accent-bright); background: var(--accent-bg);
+  display: none; /* active button already communicates mode */
 }
 
 /* ══════════════════════════════════════════
@@ -497,6 +495,39 @@ body::before {
   animation: starPulse 2s ease-in-out infinite;
 }
 .verdict.weight-star { color: var(--silver); background: var(--silver-bg); border: 1px solid var(--silver-dim); }
+.verdict.dump-warn {
+  color: var(--warn); background: rgba(255,140,50,0.09); border: 1px solid rgba(255,140,50,0.50);
+  animation: dumpPulse 2.4s ease-in-out infinite;
+}
+@keyframes dumpPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(255,140,50,0.18); }
+  50%     { box-shadow: 0 0 22px rgba(255,140,50,0.40); }
+}
+.verdict-note {
+  font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.8px;
+  color: var(--warn); text-transform: uppercase;
+  margin-top: 5px; text-align: right; opacity: 0.85; display: none;
+}
+.verdict-note.visible { display: block; }
+.lp-banner {
+  display: none; margin-bottom: 14px; padding: 10px 14px;
+  background: rgba(0,200,224,0.07); border: 1px solid rgba(0,200,224,0.28);
+  border-radius: 8px; font-size: 11px; color: var(--text-muted);
+  line-height: 1.55; backdrop-filter: blur(6px);
+}
+.lp-banner.visible { display: block; }
+.lp-banner strong { color: var(--accent-bright); font-weight: 800; }
+.lp-banner em { color: var(--accent-bright); font-style: normal; font-size: 10px; opacity: 0.75; }
+.stat-row.spike-dump {
+  border-color: rgba(255,140,50,0.50) !important;
+  background: rgba(40,18,0,0.65) !important;
+  box-shadow: 0 0 14px rgba(255,140,50,0.20), inset 0 1px 0 rgba(255,140,50,0.08) !important;
+}
+.stat-row.spike-dump .bar-fill { background: linear-gradient(90deg, #7a2e00, var(--warn)) !important; }
+.stat-row.spike-dump .spike-mark { opacity: 0.85; background: var(--warn) !important; box-shadow: 0 0 8px rgba(255,140,50,0.4) !important; }
+.stat-row.spike-dump .var-badge { color: var(--warn) !important; }
+.priority-badge.dump { color: var(--warn); background: rgba(255,153,68,0.10); border: 1px solid rgba(255,153,68,0.45); }
+.priority-badge.lp   { color: var(--accent-bright); background: var(--accent-bg); border: 1px solid var(--accent-dim); }
 
 /* ══════════════════════════════════════════
    CLEAR BUTTON
@@ -521,25 +552,23 @@ body::before {
    TOOLTIPS
 ══════════════════════════════════════════ */
 .tip { position: relative; display: inline-flex; align-items: center; }
-.tip-box {
-  position: absolute; bottom: calc(100% + 8px); left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background: rgba(4,2,2,0.92); border: 1px solid var(--accent-dim);
-  border-radius: 8px; padding: 7px 12px;
+/* tip-box are data containers only — real tooltip is #tt, JS-driven, position:fixed */
+.tip-box { display: none !important; }
+#tt {
+  position: fixed; z-index: 99999; pointer-events: none;
+  width: max-content; max-width: min(400px, calc(100vw - 24px));
+  background: rgba(4,2,2,0.96); border: 1px solid var(--accent-dim);
+  border-radius: 10px; padding: 9px 14px;
   font-size: 11px; font-weight: 700; color: var(--text);
-  pointer-events: none; opacity: 0;
-  transition: opacity 0.18s, transform 0.18s;
-  z-index: 999; box-shadow: 0 4px 18px rgba(0,0,0,0.7);
-  letter-spacing: 0.4px; line-height: 1.45;
-  max-width: 230px; white-space: normal; text-align: center;
-  backdrop-filter: blur(10px);
+  line-height: 1.55; letter-spacing: 0.4px; text-align: center;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.8); backdrop-filter: blur(14px);
+  white-space: normal; word-break: break-word;
+  opacity: 0; transition: opacity 0.15s ease; top: 0; left: 0;
 }
-.tip-box::after {
-  content: ''; position: absolute; top: 100%; left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent; border-top-color: var(--accent-dim);
-}
-.tip:hover .tip-box, .tip:focus-within .tip-box { opacity: 1; transform: translateX(-50%) translateY(0); }
+#tt.vis { opacity: 1; }
+#tt .arr { position: absolute; width:0; height:0; border: 6px solid transparent; }
+#tt .arr.dn { top: 100%;    border-top-color:    var(--accent-dim); }
+#tt .arr.up { bottom: 100%; border-bottom-color: var(--accent-dim); }
 
 /* ══════════════════════════════════════════
    FOOTER
@@ -635,26 +664,33 @@ body::before {
       </div>
     </div>
 
-    <!-- Stat count mode -->
+    <!-- Dino Mode — 3-way toggle -->
     <div class="mode-row">
-      <div class="input-label" style="margin-bottom:0">Stat Count Mode</div>
+      <div class="input-label" style="margin-bottom:0">Dino Mode</div>
       <span class="tip">
         <div class="mode-pill">
-          <button class="mode-btn active" id="btn6stat" onclick="setStatMode(6)">6 Stats</button>
-          <button class="mode-btn"        id="btn5stat" onclick="setStatMode(5)">5 Stats (No Oxygen)</button>
+          <button class="mode-btn active" id="btnLand"     onclick="setDinoMode('land')">🦖 Land / Air</button>
+          <button class="mode-btn"        id="btnAquatic"  onclick="setDinoMode('aquatic')">🐊 Aquatic</button>
+          <button class="mode-btn"        id="btnLightPet" onclick="setDinoMode('lightpet')">🐾 Light Pet</button>
         </div>
-        <span class="tip-box">Most land &amp; air dinos have 6 stats incl. Oxygen (Rex, Giga, Wyvern). Fully aquatic dinos have no Oxygen — 5 stats only (Sarco, Megalodon, Deinosuchus).</span>
+        <span class="tip-box">Land/Air: 6 stats, Oxygen is a dump stat (Rex, Giga, Wyvern, Raptor). Aquatic: 5 stats, Oxygen disabled (Sarco, Megalodon, Deinosuchus). Light Pet: 6 stats — Oxygen is #2 priority for recharge rate (Bulbdog, Cosmo, Featherlight, Glowbug, Shinehorn, Glowtail). Priority order for Light Pets: Health → Oxygen → Damage.</span>
       </span>
-      <span class="mode-badge" id="modeBadge">÷ 6 stats</span>
+      <span class="mode-badge" id="modeBadge">÷ 6 · Land</span>
     </div>
   </div>
 
   <!-- COMPARATOR PANEL -->
   <div class="panel">
     <div class="panel-title"><span class="icon">🦕</span> Stat Comparator</div>
+    <div id="lpBanner" class="lp-banner">
+      🐾 <strong>Light / Charge Pet Mode</strong> — Oxygen controls recharge rate and is treated as a <strong>priority stat</strong>. Priority order: Health → Oxygen → Damage. Food spike is still wasted RNG.<br>
+      <em>Bulbdog · Featherlight · Glowbug · Cosmo · Shinehorn · Glowtail</em>
+    </div>
     <div class="legend">
+      <span class="tip"><div class="legend-item"><div class="ldot" style="background:var(--warn)"></div>⚠ Dump Spike</div><span class="tip-box">Spike in Oxygen or Food — dump stats that waste RNG. Shown orange. Cannot earn Strong Breed. Cull unless in Light Pet mode (Oxygen only).</span></span>
       <span class="tip"><div class="legend-item"><div class="ldot" style="background:var(--gold)"></div>⭐ Star Spike</div><span class="tip-box">Massive spike in Health, Stamina or Damage — breed this dino regardless of overall spread.</span></span>
       <span class="tip"><div class="legend-item"><div class="ldot" style="background:var(--silver)"></div>Weight Spike</div><span class="tip-box">Major Weight spike — valuable for flyers and haulers.</span></span>
+      <span class="tip"><div class="legend-item"><div class="ldot" style="background:var(--warn)"></div>⚠ Dump Spike</div><span class="tip-box">Spike in Oxygen or Food (dump stats) — RNG wasted. Shows orange, cannot earn Strong Breed verdict. Exception: Oxygen is not a dump spike in Light Pet mode.</span></span>
       <span class="tip"><div class="legend-item"><div class="ldot" style="background:var(--green)"></div>Above Avg</div><span class="tip-box">Above the baseline — good for breeding.</span></span>
       <span class="tip"><div class="legend-item"><div class="ldot" style="background:var(--grey)"></div>At Average</div><span class="tip-box">Exactly average — neutral.</span></span>
       <span class="tip"><div class="legend-item"><div class="ldot" style="background:var(--red)"></div>Below Avg</div><span class="tip-box">Below average — points wasted here.</span></span>
@@ -692,8 +728,9 @@ body::before {
     <div class="verdict-wrap">
       <span class="tip">
         <span class="verdict neutral" id="verdictText">Awaiting Data</span>
-        <span class="tip-box">⭐ Star Dino = massive Health/Stamina/Damage spike — breed it regardless. ⭐ Weight Star = big Weight spike. ✓ Strong Breed = good spread. ~ Marginal. ✕ Cull = nothing worth keeping.</span>
+        <span class="tip-box">⭐ Star Dino = priority spike (Land: Health/Stamina/Damage — Light Pet: Health/Oxygen/Damage). ⭐ Weight Star = big Weight spike. ⚠ Dump Spike = Oxygen/Food spiked with no priority spike — wasted RNG, cull unless Light Pet. ✓ Strong Breed = good spread, no dump spikes. ~ Marginal. ✕ Cull.</span>
       </span>
+      <div class="verdict-note" id="verdictNote"></div>
     </div>
   </div>
 
@@ -702,21 +739,25 @@ body::before {
     <span class="tip-box">Reset all stat inputs and start fresh.</span>
   </span>
 
-  <div class="footer"><span>🦖</span> Sass House Sassalyzer v1.3 · Breeding Optimization <span>🦕</span></div>
+  <div class="footer"><span>🦖</span> Sass House Sassalyzer v1.4 · Breeding Optimization <span>🦕</span></div>
 
 </div><!-- /app-wrapper -->
 
+<div id="tt" role="tooltip">
+  <span id="tt-txt"></span>
+  <span id="tt-arr" class="arr dn"></span>
+</div>
 <script>
 const STATS = [
-  { key:'health',  name:'Health',  icon:'♥', priority:1, tip:'Total hit points. PRIORITY STAT — a big spike here is worth breeding on even if everything else is poor.' },
-  { key:'stamina', name:'Stamina', icon:'⚡', priority:1, tip:'Energy for sprinting and attacking. PRIORITY STAT — high stamina is critical for combat and travel dinos.' },
-  { key:'oxygen',  name:'Oxygen',  icon:'◎', priority:0, tip:'Underwater breath. Dump stat — a spike here has no breeding value for most dinos.' },
-  { key:'food',    name:'Food',    icon:'⬟', priority:0, tip:'Hunger rate. Not a breeding priority — a spike here is wasted RNG.' },
-  { key:'weight',  name:'Weight',  icon:'⊞', priority:2, tip:'Carry capacity. SECONDARY PRIORITY — especially important for flyers and hauling dinos.' },
-  { key:'damage',  name:'Damage',  icon:'⚔', priority:1, tip:'Melee damage multiplier. PRIORITY STAT — a spike here is extremely valuable. Always breed on this.' },
+  { key:'health',  name:'Health',  icon:'♥', priority:1,  basePriority:1,  tip:'TOP PRIORITY in all modes (Land, Aquatic, Light Pet). A spike here is always worth breeding on, even if everything else is average.' },
+  { key:'stamina', name:'Stamina', icon:'⚡', priority:1,  basePriority:1,  tip:'PRIORITY STAT for Land/Air and Aquatic. In Light Pet mode Stamina is standard — Oxygen takes the #2 slot (Health → Oxygen → Damage) for recharge rate.' },
+  { key:'oxygen',  name:'Oxygen',  icon:'◎', priority:-1, basePriority:-1, tip:'DUMP STAT in Land/Air and Aquatic modes — a spike here wastes RNG. EXCEPTION: in 🐾 Light Pet mode Oxygen controls recharge rate and is the #2 priority (Health → Oxygen → Damage). Switch to Light Pet mode for Bulbdog, Cosmo, Featherlight, Glowbug, Shinehorn, Glowtail.' },
+  { key:'food',    name:'Food',    icon:'⬟', priority:-1, basePriority:-1, tip:'DUMP STAT in every mode — Land, Aquatic, and Light Pet. Food spike is always wasted RNG. The food drain mechanic has zero breeding value. Cull if Food spiked and nothing priority did.' },
+  { key:'weight',  name:'Weight',  icon:'⊞', priority:2,  basePriority:2,  tip:'Carry capacity. SECONDARY PRIORITY — especially important for flyers and hauling dinos.' },
+  { key:'damage',  name:'Damage',  icon:'⚔', priority:1,  basePriority:1,  tip:'Melee damage multiplier. PRIORITY STAT in all modes. In Light Pet mode this is #3 (after Health and Oxygen). Always worth breeding.' },
 ];
 
-let currentAvg=25, maxStatSeen=1, statMode=6;
+let currentAvg=25, maxStatSeen=1, statMode=6, dinoMode='land';
 
 function getAvg() {
   const level = parseInt(document.getElementById('dinoLevel').value)||150;
@@ -730,15 +771,42 @@ function setTheme(t) {
   document.getElementById('btn-keebs').className   = 'theme-btn'+(t==='keebs'  ?' active':'');
 }
 
-function setStatMode(n) {
-  statMode=n;
-  document.getElementById('btn6stat').className='mode-btn'+(n===6?' active':'');
-  document.getElementById('btn5stat').className='mode-btn'+(n===5?' active':'');
-  document.getElementById('modeBadge').textContent = n===5 ? '÷ 5 stats' : '÷ 6 stats';
-  const oxyRow=document.getElementById('row-oxygen');
-  const oxyIn =document.getElementById('input-oxygen');
-  if(n===5){ oxyRow.classList.add('disabled'); oxyIn.value=''; }
-  else     { oxyRow.classList.remove('disabled'); }
+function setDinoMode(mode) {
+  dinoMode = mode;
+  document.getElementById('btnLand').className     = 'mode-btn'+(mode==='land'    ?' active':'');
+  document.getElementById('btnAquatic').className  = 'mode-btn'+(mode==='aquatic' ?' active':'');
+  document.getElementById('btnLightPet').className = 'mode-btn'+(mode==='lightpet'?' active':'');
+
+  const oxy    = STATS.find(s=>s.key==='oxygen');
+  const oxyRow = document.getElementById('row-oxygen');
+  const oxyIn  = document.getElementById('input-oxygen');
+  const badge  = document.getElementById('badge-oxygen');
+  const banner = document.getElementById('lpBanner');
+  const mb     = document.getElementById('modeBadge');
+
+  // Reset all priorities to base first
+  STATS.forEach(s => s.priority = s.basePriority);
+
+  if(mode==='aquatic'){
+    statMode = 5; oxy.priority = -1;
+    if(oxyRow){ oxyRow.classList.add('disabled'); }
+    if(oxyIn)  { oxyIn.value=''; }
+    mb.textContent = '÷ 5 · Aquatic';
+    if(banner) banner.className='lp-banner';
+    if(badge){ badge.className='priority-badge dump'; badge.textContent='⚠ Dump Stat'; }
+  } else if(mode==='lightpet'){
+    statMode = 6; oxy.priority = 1;
+    if(oxyRow){ oxyRow.classList.remove('disabled'); }
+    mb.textContent = '÷ 6 · Light Pet';
+    if(banner) banner.className='lp-banner visible';
+    if(badge){ badge.className='priority-badge lp'; badge.textContent='★ Recharge'; }
+  } else { // land (default)
+    statMode = 6; oxy.priority = -1;
+    if(oxyRow){ oxyRow.classList.remove('disabled'); }
+    mb.textContent = '÷ 6 · Land';
+    if(banner) banner.className='lp-banner';
+    if(badge){ badge.className='priority-badge dump'; badge.textContent='⚠ Dump Stat'; }
+  }
   updateAvg();
 }
 
@@ -749,8 +817,17 @@ function buildGrid() {
     const row=document.createElement('div');
     row.className='stat-row'; row.id='row-'+s.key;
     let badge='';
-    if(s.priority===1) badge='<span class="priority-badge p1">★ Priority</span>';
-    if(s.priority===2) badge='<span class="priority-badge p2">★ Notable</span>';
+    if(s.key==='oxygen'){
+      const bc = dinoMode==='lightpet' ? 'priority-badge lp' : 'priority-badge dump';
+      const bt = dinoMode==='lightpet' ? '★ Recharge' : '⚠ Dump Stat';
+      badge = '<span class="'+bc+'" id="badge-oxygen">'+bt+'</span>';
+    } else if(s.key==='food'){
+      badge = '<span class="priority-badge dump">⚠ Dump Stat</span>';
+    } else if(s.priority===1){
+      badge = '<span class="priority-badge p1">★ Priority</span>';
+    } else if(s.priority===2){
+      badge = '<span class="priority-badge p2">★ Notable</span>';
+    }
     row.innerHTML=`
       <div class="stat-name"><span class="stat-icon">${s.icon}</span>${s.name}${badge}</div>
       <div class="bar-wrap" id="bw-${s.key}">
@@ -779,8 +856,10 @@ function updateAvg() {
 }
 
 function recalcAll() {
-  let above=0,exact=0,below=0,netSum=0,anyFilled=false,maxVal=1;
-  let hasPrimary=false, hasWeight=false;
+  // goodAbove/goodBelow exclude dump spikes — they cannot inflate the verdict
+  let above=0, exact=0, below=0, netSum=0, anyFilled=false, maxVal=1;
+  let goodAbove=0, goodBelow=0;
+  let hasPrimary=false, hasWeight=false, hasDumpSpike=false;
   const thr=spikeThreshold();
   const active=STATS.filter(s=>!(statMode===5&&s.key==='oxygen'));
   active.forEach(s=>{ const v=parseFloat(document.getElementById('input-'+s.key).value); if(!isNaN(v)) maxVal=Math.max(maxVal,v); });
@@ -797,37 +876,77 @@ function recalcAll() {
     if(dis){ bar.style.width='0%'; vb.textContent='—'; return; }
     amk.style.left=Math.min((currentAvg/maxStatSeen)*100,100)+'%';
     const val=parseFloat(inp.value);
-    if(isNaN(val)||inp.value===''){ row.className='stat-row'; vb.textContent='—'; bar.style.width='0%'; if(smk) smk.style.opacity='0'; return; }
+    if(isNaN(val)||inp.value===''){
+      row.className='stat-row'; vb.textContent='—';
+      bar.style.width='0%'; if(smk) smk.style.opacity='0'; return;
+    }
     anyFilled=true;
     const v=val-currentAvg; netSum+=v;
     bar.style.width=Math.min((val/maxStatSeen)*100,100)+'%';
     if(smk) smk.style.left=Math.min((val/maxStatSeen)*100,100)+'%';
     const isSpike=v>=thr;
-    if(isSpike&&s.priority===1) hasPrimary=true;
-    if(isSpike&&s.priority===2) hasWeight=true;
-    if(isSpike&&s.priority===1)      { row.className='stat-row spike-primary';   vb.textContent='+'+v.toFixed(1); above++; }
-    else if(isSpike&&s.priority===2) { row.className='stat-row spike-secondary'; vb.textContent='+'+v.toFixed(1); above++; }
-    else if(v>0.05)  { row.className='stat-row above'; vb.textContent='+'+v.toFixed(1); above++; }
-    else if(v<-0.05) { row.className='stat-row below'; vb.textContent=v.toFixed(1);    below++; }
-    else             { row.className='stat-row exact'; vb.textContent='±0.0';          exact++; }
+    const pri=s.priority; // already flipped by setDinoMode for oxygen in light pet mode
+
+    if(isSpike && pri===1)  hasPrimary=true;
+    if(isSpike && pri===2)  hasWeight=true;
+    if(isSpike && pri===-1) hasDumpSpike=true;
+
+    if(isSpike && pri===1){
+      row.className='stat-row spike-primary';
+      vb.textContent='+'+v.toFixed(1); above++; goodAbove++;
+    } else if(isSpike && pri===2){
+      row.className='stat-row spike-secondary';
+      vb.textContent='+'+v.toFixed(1); above++; goodAbove++;
+    } else if(isSpike && pri===-1){
+      row.className='stat-row spike-dump'; // orange — dump spike
+      vb.textContent='+'+v.toFixed(1); above++; // display count only, NOT goodAbove
+    } else if(v>0.05){
+      row.className='stat-row above';
+      vb.textContent='+'+v.toFixed(1); above++; goodAbove++;
+    } else if(v<-0.05){
+      row.className='stat-row below';
+      vb.textContent=v.toFixed(1); below++; goodBelow++;
+    } else {
+      row.className='stat-row exact';
+      vb.textContent='±0.0'; exact++;
+    }
   });
 
   document.getElementById('sumAbove').textContent=above;
   document.getElementById('sumExact').textContent=exact;
   document.getElementById('sumBelow').textContent=below;
-  const ne=document.getElementById('sumNet');
-  const vd=document.getElementById('verdictText');
+
+  const ne   = document.getElementById('sumNet');
+  const vd   = document.getElementById('verdictText');
+  const note = document.getElementById('verdictNote');
+
   if(anyFilled){
     ne.textContent=(netSum>=0?'+':'')+netSum.toFixed(1);
     ne.style.color=netSum>0?'var(--green)':netSum<0?'var(--red)':'var(--warn)';
-    if(hasPrimary)         { vd.textContent='⭐ Star Dino!';   vd.className='verdict star'; }
-    else if(hasWeight)     { vd.textContent='⭐ Weight Star';  vd.className='verdict weight-star'; }
-    else if(above>below+1) { vd.textContent='✓ Strong Breed!';vd.className='verdict good'; }
-    else if(below>above+1) { vd.textContent='✕ Cull It';      vd.className='verdict bad'; }
-    else                   { vd.textContent='~ Marginal';     vd.className='verdict neutral'; }
+
+    let noteText='';
+    if(hasPrimary){
+      vd.textContent='⭐ Star Dino!'; vd.className='verdict star';
+      if(hasDumpSpike) noteText='⚠ Dump spikes present — breed for priority stat only';
+    } else if(hasWeight){
+      vd.textContent='⭐ Weight Star'; vd.className='verdict weight-star';
+      if(hasDumpSpike) noteText='⚠ Dump spikes present — weight line only';
+    } else if(hasDumpSpike){
+      vd.textContent='⚠ Dump Spike!'; vd.className='verdict dump-warn';
+      const dumpNames=STATS.filter(s=>s.priority===-1&&s.key!=='oxygen'||s.key==='oxygen'&&dinoMode!=='lightpet').filter(s=>{const v=parseFloat(document.getElementById('input-'+s.key).value)||0; return v-currentAvg>=thr;}).map(s=>s.name).join(' & ');
+      noteText=(dumpNames||'Dump stat')+' spiked — wasted RNG. Cull unless Light Pet.';
+    } else if(goodAbove>goodBelow+1){
+      vd.textContent='✓ Strong Breed!'; vd.className='verdict good';
+    } else if(goodBelow>goodAbove+1){
+      vd.textContent='✕ Cull It'; vd.className='verdict bad';
+    } else {
+      vd.textContent='~ Marginal'; vd.className='verdict neutral';
+    }
+    if(note){ note.textContent=noteText; note.className=noteText?'verdict-note visible':'verdict-note'; }
   } else {
     ne.textContent='—'; ne.style.color='var(--text-muted)';
     vd.textContent='Awaiting Data'; vd.className='verdict neutral';
+    if(note){ note.textContent=''; note.className='verdict-note'; }
   }
 }
 
@@ -837,7 +956,7 @@ function adjustLevel(d) {
 }
 function clearStats() {
   STATS.forEach(s=>{
-    if(statMode===5&&s.key==='oxygen') return;
+    if(dinoMode==='aquatic'&&s.key==='oxygen') return;
     document.getElementById('input-'+s.key).value='';
     document.getElementById('row-'+s.key).className='stat-row';
     document.getElementById('var-'+s.key).textContent='—';
@@ -848,6 +967,51 @@ function clearStats() {
 }
 
 document.getElementById('dinoLevel').addEventListener('input',updateAvg);
+
+// Global floating tooltip system
+(function(){
+  const tt  = document.getElementById('tt');
+  const arr = document.getElementById('tt-arr');
+  const txt = document.getElementById('tt-txt');
+  const GAP = 10, MARGIN = 8;
+
+  function show(el) {
+    var src = el.querySelector('.tip-box');
+    if(!src || !src.textContent.trim()) return;
+    txt.textContent = src.textContent.trim();
+    tt.classList.add('vis');
+    position(el);
+  }
+
+  function position(el) {
+    tt.style.left='0'; tt.style.top='0';
+    var tw=tt.offsetWidth, th=tt.offsetHeight;
+    var r=el.getBoundingClientRect();
+    var vw=window.innerWidth;
+    var top, below=false;
+    if(r.top - th - GAP >= MARGIN){ top=r.top-th-GAP; }
+    else { top=r.bottom+GAP; below=true; }
+    var left=r.left+r.width/2-tw/2;
+    left=Math.max(MARGIN, Math.min(left, vw-tw-MARGIN));
+    tt.style.left=left+'px'; tt.style.top=top+'px';
+    arr.className='arr '+(below?'up':'dn');
+    var arrowX=r.left+r.width/2-left;
+    arr.style.left=Math.max(10, Math.min(arrowX-6, tw-22))+'px';
+  }
+
+  function hide(){ tt.classList.remove('vis'); }
+
+  document.addEventListener('mouseover', function(e){
+    var t=e.target.closest('.tip'); if(t) show(t);
+  });
+  document.addEventListener('mouseout', function(e){
+    var t=e.target.closest('.tip');
+    if(t && !t.contains(e.relatedTarget)) hide();
+  });
+  document.addEventListener('scroll', function(){ hide(); }, true);
+  document.addEventListener('click', function(){ hide(); });
+})();
+
 buildGrid(); updateAvg();
 </script>
 </body>
