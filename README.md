@@ -1,3 +1,5 @@
+![App Dashboard Preview](preview.jpg)
+
 # Sass House Sassalyzer
 
 **Dino Breeding · Stat Optimizer · Built by Sass House**
