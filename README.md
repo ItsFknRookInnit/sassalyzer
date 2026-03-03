@@ -8,6 +8,10 @@ Single-file, browser-based ARK breeding tool to calculate ideal stat baselines, 
 
 ## Usage
 
+
+Open the app [here](https://sassalyzer.vercel.app/).
+
+
 Select the appropriate mode to adjust stat counts and priority logic:
 
 | Mode | Stats | Oxygen Status | Priority Stats |
@@ -15,6 +19,9 @@ Select the appropriate mode to adjust stat counts and priority logic:
 | **Land / Air** | 6 | Dump stat (orange) | Health · Stamina · Damage |
 | **Aquatic** | 5 | Disabled | Health · Stamina · Damage |
 | **Light Pet** | 6 | **Priority #2** | **Health · Oxygen · Damage** |
+
+Input the stat points of the creature you are looking at.
+
 
 **Verdict Reference:**
 * **⭐ Star Dino! (gold):** Priority spike—always breed regardless of spread.
